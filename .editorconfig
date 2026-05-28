@@ -1,0 +1,44 @@
+root = true
+
+# ----------------------------------------------------------------------------
+# Predefinições para todos os ficheiros
+# Codificação UTF-8, fim de linha estilo Unix (LF) e newline final obrigatório
+# ----------------------------------------------------------------------------
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# ----------------------------------------------------------------------------
+# Markdown
+# Desliga remoção de espaços no fim da linha — em MD isso pode alterar quebras
+# ----------------------------------------------------------------------------
+[*.md]
+trim_trailing_whitespace = false
+
+# ----------------------------------------------------------------------------
+# Indentação com 4 espaços
+# Python e HTML (convenção comum nestas linguagens).
+# ----------------------------------------------------------------------------
+[*.{py,html}]
+indent_style = space
+indent_size = 4
+
+# ----------------------------------------------------------------------------
+# Indentação com 2 espaços
+# Ecossistema web (JS/TS/React), estilos, JSON e YAML.
+# ----------------------------------------------------------------------------
+[*.{js,jsx,mjs,cjs,ts,tsx,css,scss,sass,less,json,jsonc,yml,yaml,cwl}]
+indent_style = space
+indent_size = 2
+
+# ----------------------------------------------------------------------------
+# Makefile e fragmentos Make
+# As receitas do Make exigem carácter TAB real; tab_width / indent_size = tab
+# definem a largura visual do tab (equivalente a 4 colunas).
+# ----------------------------------------------------------------------------
+[{Makefile,makefile,*.mk}]
+indent_style = tab
+tab_width = 4
+indent_size = tab
