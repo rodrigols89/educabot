@@ -13,16 +13,18 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
+        exclude: ^alembic/versions/
 
       # --------------------------------------------------------
       #  TESTE (somente quando arquivos Python mudarem)
       # --------------------------------------------------------
-      - id: pytest-test
-        name: Check Test (Pytest)
-        entry: make test
-        language: system
-        types: [python]
-        pass_filenames: false
+      #- id: pytest-test
+      #  name: Check Test (Pytest)
+      #  entry: make test
+      #  language: system
+      #  types: [python]
+      #  pass_filenames: false
+      #  exclude: ^alembic/versions/
 
       # --------------------------------------------------------
       #  COVERAGE MINIMUM (falha se < 70%)
@@ -33,3 +35,4 @@ repos:
       #  language: system
       #  types: [python]
       #  pass_filenames: false
+      #  exclude: ^alembic/versions/

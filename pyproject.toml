@@ -32,10 +32,10 @@ dev = [
 [tool.ruff]
 line-length = 79
 exclude = [
-    "*/migrations",
-    "core/settings.py",
-    "apps/users/adapter.py",
-    "utils/messages.py",
+    ".venv",
+    "alembic/versions",
+    "migrations",
+    "__pycache__",
     "**/driver.py",
 ]
 
