@@ -407,8 +407,10 @@ Exemplos:
 
 ## `🚀 main.py`
 
-> **Ponto de entrada da aplicação.**  
-> É o primeiro arquivo carregado pelo Uvicorn.
+> **Responsável por inicializar a aplicação.**
+
+ - É o ponto de entrada da aplicação.
+ - Primeiro arquivo carregado pelo Uvicorn.
 
 ### `Exemplo visual`
 
@@ -420,6 +422,27 @@ uvicorn app.main:app
           │
           ▼
       FastAPI()
+```
+
+[main.py](main.py)
+```python
+"""
+Main entrypoint for FastAPI application.
+
+Initializes the API server and routes.
+"""
+
+from fastapi import FastAPI
+
+from app.api.health import router as health_router
+
+app = FastAPI(
+    title="WhatsApp Orders API",
+    version="1.0.0",
+)
+
+
+app.include_router(health_router)
 ```
 
 ---
