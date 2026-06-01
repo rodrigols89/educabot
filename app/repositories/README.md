@@ -1,25 +1,24 @@
 # `📚 repositories/`
 
-> Camada responsável por conversar diretamente com o banco.
+> O diretório `📚 repositories/` é responsável por conversar diretamente com o banco.
 
-Responsabilidades:
+A partir dele que nós executamos queries, como:
 
- - **Executar:**
-   - SELECT
-   - INSERT
-   - UPDATE
-   - DELETE
+ - SELECT
+ - INSERT
+ - UPDATE
+ - DELETE
 
 ### `Exemplo visual`
 
 ```text
-Service
+Service (Regras de negócio)
    │
    ▼
-Repository
+Repository (Consulta/Query)
    │
    ▼
-Banco
+Banco de Dados
 ```
 
 ## Conteúdo
@@ -170,6 +169,67 @@ def exists_request_today(
         is not None
     )
 ```
+
+<details>
+
+<summary>Explicação Passo a Passo (Step-by-Step)</summary>
+
+<br/>
+
+```python
+start_of_day = datetime.utcnow().replace(
+    hour=0,
+    minute=0,
+    second=0,
+    microsecond=0,
+)
+```
+
+ - `datetime.utcnow()`
+   - Retorna a data e hora atual em UTC (Tempo Universal Coordenado).
+   - Por exemplo: `datetime(2026, 6, 1, 16, 35, 42, 123456)`
+   - Representando: `01/06/2026 16:35:42.123456 UTC`
+ - `replace()`
+   - O método replace() cria um novo objeto datetime alterando apenas os campos informados.
+
+```python
+end_of_day = start_of_day + timedelta(days=1)
+```
+
+ - `timedelta(days=1)`
+   - `timedelta` representa uma diferença de tempo.
+
+```python
+return (
+    db.query(Pedido)
+    .filter(Pedido.gestor_id == gestor_id)
+    .filter(Pedido.tipo == request_type)
+    .filter(Pedido.criado_em >= start_of_day)
+    .filter(Pedido.criado_em < end_of_day)
+    .first()
+    is not None
+)
+```
+
+ - Consulta a tabela `Pedido` para verificar se já existe hoje um pedido do tipo informado (gas ou agua) para o gestor informado.
+ - Se encontrar pelo menos um registro, retorna `True`; caso contrário, retorna `False`.
+
+Ou ainda mais resumido:
+
+Verifica se o gestor já fez hoje um pedido da categoria informada. Retorna `True` se existir e `False` se não existir.
+
+**Resultado SQL aproximado:**
+
+```python
+SELECT *
+FROM pedido
+WHERE gestor_id = 5
+  AND tipo = 'gas'
+  AND criado_em >= '2026-06-01 00:00:00'
+  AND criado_em < '2026-06-02 00:00:00'
+```
+
+</details>
 
 ---
 

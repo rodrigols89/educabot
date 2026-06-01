@@ -41,7 +41,7 @@ def exists_request_today(
     True
     """
 
-    # Get "start" and "end" of day
+    # Get the start and end of the day
     start_of_day = datetime.utcnow().replace(
         hour=0,
         minute=0,
@@ -49,10 +49,10 @@ def exists_request_today(
         microsecond=0,
     )
 
-    # Get "end" of day
+    # Get the end of the day
     end_of_day = start_of_day + timedelta(days=1)
 
-    # Check if request already exists
+    # Check if a request already exists
     return (
         db.query(Pedido)
         .filter(Pedido.gestor_id == gestor_id)

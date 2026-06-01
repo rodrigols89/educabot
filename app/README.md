@@ -50,17 +50,6 @@ A pasta `app/` é a raiz da aplicação. Ela funciona como o "container lógico"
  - É onde ficam os endpoints da API.
  - Ela **recebe requisições HTTP** e **devolve respostas HTTP**.
 
-### `Exemplo visual`
-
-```text
-Cliente
-   │
-   ▼
-/api
-   │
-   ▼
-service
-```
 
 
 
@@ -91,17 +80,6 @@ service
  - Guarda configurações globais do sistema.
  - Tudo que é central para a aplicação fica aqui.
 
-### `Exemplo visual`
-
-```text
-           core
-          / | \
-         /  |  \
-        /   |   \
-settings    |    logging
-            |
-           auth
-```
 
 
 
@@ -129,7 +107,7 @@ settings    |    logging
 
 ## `🗄️ db/`
 
-> Camada responsável pela conexão com o banco.
+> Camada responsável pela conexão com o Banco de Dados.
 
 Responsabilidades:
 
@@ -137,17 +115,6 @@ Responsabilidades:
  - Session
  - Base ORM
 
-### `Exemplo visual`
-
-```text
-Application
-     │
-     ▼
-    db
-     │
-     ▼
- PostgreSQL
-```
 
 
 
@@ -175,17 +142,9 @@ Application
 
 ## `🏛️ models/`
 
- - Representa as tabelas do banco.
+ - Representa as tabelas do Banco de Dados.
  - Cada classe equivale a uma tabela.
 
-### `Exemplo visual`
-
-```text
-Model SQLAlchemy
-       │
-       ▼
-Tabela PostgreSQL
-```
 
 
 
@@ -223,17 +182,6 @@ Responsabilidades:
    - UPDATE
    - DELETE
 
-### `Exemplo visual`
-
-```text
-Service
-   │
-   ▼
-Repository
-   │
-   ▼
-Banco
-```
 
 
 
@@ -267,17 +215,6 @@ Responsabilidades:
 
 > Validar dados da API.
 
-### `Exemplo visual`
-
-```text
-JSON recebido
-      │
-      ▼
-Schema
-      │
-      ▼
-Service
-```
 
 
 
@@ -327,20 +264,6 @@ Essa lógica NÃO deve ficar:
 
 Ela fica no service.
 
-### `Exemplo visual`
-
-```text
-API
- │
- ▼
-Service
- │
- ▼
-Repository
- │
- ▼
-Banco
-```
 
 
 

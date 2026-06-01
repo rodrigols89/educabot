@@ -25,13 +25,13 @@ Essa lógica NÃO deve ficar:
 API
  │
  ▼
-Service
+Service (Regras de negócio)
  │
  ▼
-Repository
+Repository (Consulta/Query)
  │
  ▼
-Banco
+Banco de Dados
 ```
 
 ## Conteúdo

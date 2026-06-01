@@ -1,10 +1,8 @@
 # `🔧 utils/`
 
-Responsabilidades:
+> O diretório `🔧 utils/` é responsável por *"guardar coisas que podem ser usadas em vários lugares"*.
 
-> Guardar coisas que podem ser usadas em vários lugares.
-
-Exemplos:
+Por, exemplo:
 
  - Formatar telefone
  - Validar CPF
@@ -59,14 +57,16 @@ Exemplos:
 
 A função `validate_request_command()` vai ser responsável por validar comandos como:
 
- - /gas 2
- - /agua 5
+ - /gas
+ - /agua
 
 Ela garante:
 
  - Formato válido
  - Quantidade numérica
  - Comando permitido
+
+### `Código Completo`
 
 [regex.py](regex.py)
 ```python
@@ -88,7 +88,7 @@ def validate_request_command(command: str) -> bool:
 
 <details>
 
-<summary>Explicação passo a passo (Step-by-Step)</summary>
+<summary>Explicação Passo a Passo (Step-by-Step)</summary>
 
 <br/>
 
@@ -131,11 +131,11 @@ Continuando, vamos entender o `re.match()` que recebeu como parâmetro:
 
  - `True`
    - Se o comando for válido, a funçã `re.match()` retorna `True`.
- -  `False`
+ - `False`
    - Se o comando for inválido, a funçã `re.match()` retorna `False`
 
 > **NOTE:**  
-> Como o retorno da função é do tipo `bool`, vamos retornar `True` ou `False` para a funçã `validate_request_command()`.
+> Como o retorno da função é do tipo `bool`, vamos retornar `True` ou `False` com a função  `validate_request_command()`.
 
 </details>
 

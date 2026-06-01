@@ -1,22 +1,6 @@
 # `📦 schemas/`
 
-> Modelos Pydantic usados para entrada e saída de dados da API.
-
-Responsabilidades:
-
-> Validar dados da API.
-
-### `Exemplo visual`
-
-```text
-JSON recebido
-      │
-      ▼
-Schema
-      │
-      ▼
-Service
-```
+> O diretório `📦 schemas/` contém os modelos Pydantic usados para entrada e saída de dados da API.
 
 ## Conteúdo
 

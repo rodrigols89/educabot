@@ -1,19 +1,6 @@
 # `⚙️ core/`
 
- - Guarda configurações globais do sistema.
- - Tudo que é central para a aplicação fica aqui.
-
-### `Exemplo visual`
-
-```text
-           core
-          / | \
-         /  |  \
-        /   |   \
-settings    |    logging
-            |
-           auth
-```
+> O diretório `⚙️ core/` é responsável por *"guarda configurações globais do sistema"*.
 
 ## Conteúdo
 
@@ -83,13 +70,6 @@ O módulo `config.py` é responsável por carregar variáveis de ambiente e cent
 
 [config.py](config.py)
 ```python
-"""
-Configuration module for application settings.
-
-This module loads environment variables and provides
-centralized configuration for the system.
-"""
-
 import os
 
 from dotenv import load_dotenv
@@ -98,14 +78,6 @@ load_dotenv()
 
 
 class Settings:
-    """
-    Application settings loader.
-
-    Attributes
-    ----------
-    DATABASE_URL : str
-        Database connection string.
-    """
 
     DATABASE_URL: str = os.getenv("DATABASE_URL", "")
 

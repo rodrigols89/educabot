@@ -1,24 +1,6 @@
 # `🗄️ db/`
 
-> Camada responsável pela conexão com o Banco de Dados.
-
-Responsabilidades:
-
- - Engine SQLAlchemy
- - Session
- - Base ORM
-
-### `Exemplo visual`
-
-```text
-Application
-     │
-     ▼
-    db
-     │
-     ▼
- PostgreSQL
-```
+> O diretório `🗄️ db/` é responsável por *"gerenciar (conexão) o banco de dados"*.
 
 ## Conteúdo
 
@@ -60,12 +42,6 @@ Ao herdar de `Base`, uma classe passa a ser reconhecida pelo ORM como uma tabela
 
 [base.py](base.py)
 ```python
-"""
-SQLAlchemy base configuration module.
-
-Defines the declarative base used by all models.
-"""
-
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -103,12 +79,6 @@ Base = declarative_base()
 
 [session.py](session.py)
 ```python
-"""
-Database session manager.
-
-Provides SQLAlchemy engine and session factory.
-"""
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -125,24 +95,121 @@ SessionLocal = sessionmaker(
 
 
 def get_db():
-    """
-    Provide database session dependency.
 
-    Yields
-    ------
-    Session
-        SQLAlchemy session instance.
-
-    Examples
-    --------
-    >>> db = next(get_db())
-    """
     db = SessionLocal()
+
     try:
         yield db
     finally:
         db.close()
 ```
+
+<details>
+
+<summary>Explicação Passo a Passo (Step-by-Step)</summary>
+
+<br/>
+
+### `Entendendo a função create_engine()`
+
+Primeiro, vamos entender a função `create_engine()`:
+
+```python
+engine = create_engine(settings.DATABASE_URL, echo=True)
+```
+
+ - **O que ela receebe?**
+   - O principal que nós estamos passando como argumento é a string de conexão do banco de dados (URL).
+ - **O que ela retorna?**
+   - Retorna um objeto do tipo: `sqlalchemy.engine.Engine`
+   - Oou simplesmente: `Engine`
+ - **O que é um Engine?**
+   - O `Engine` é o componente que:
+     - Sabe como conectar ao banco;
+     - Gerencia o pool de conexões;
+     - Executa comandos SQL;
+     - É utilizado pelas Sessions do SQLAlchemy.
+
+**Visualmente:**
+
+```bash
+Aplicação
+    ↓
+Session
+    ↓
+Engine
+    ↓
+Banco de Dados
+```
+
+### `Entendendo a classe sessionmaker()`
+
+> Enquanto o `engine` sabe como conectar ao banco, o `sessionmaker()` sabe como criar sessões que usarão essa conexão.
+
+```python
+create_engine()
+      ↓
+    Engine
+      ↓
+sessionmaker()
+      ↓
+ SessionLocal
+      ↓
+ Session()
+```
+
+> **Mas, o que é uma Session?**
+
+Uma `Session` é o objeto que você usa para:
+
+ - db.add(objeto)
+ - db.query(Model)
+ - db.commit()
+ - db.rollback()
+ - db.close()
+
+```python
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
+```
+
+ - `bind=engine`
+   - No código acima o mais importante é o `bind=engine`, que liga a sessão ao banco configurado pelo engine.
+ - `autocommit=False`
+   - *Significa:*
+     - Nada será salvo automaticamente.
+   - *Você precisa chamar:*
+     - `db.commit()` -> Só o db.add não salva no Banco de Dados.
+ - `autoflush=False`
+   - Controla quando alterações pendentes são enviadas para o banco.
+
+### `Entendendo a função get_db()`
+
+```python
+def get_db():
+
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()
+```
+
+No código acima:
+
+ - `db = SessionLocal()`
+   - Primeiro, nó scriamos uma instância da `SessionLocal`.
+   - Que nada mais é que uma referência para `sessionmaker()`.
+ - `try:`
+   - `yield db` -> Entrega sessão para quem chamou a função.
+ - `finally:`
+   - `db.close()` -> Fecha a sessão.
+
+</details>
 
 ---
 

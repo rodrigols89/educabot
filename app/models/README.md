@@ -3,15 +3,6 @@
  - Representa as tabelas do banco.
  - Cada classe equivale a uma tabela.
 
-### `Exemplo visual`
-
-```text
-Model SQLAlchemy
-       │
-       ▼
-Tabela PostgreSQL
-```
-
 ## Conteúdo
 
  - [`gestor.py`](#gestor-py)
@@ -229,7 +220,7 @@ class Log(Base):
 
 ## `pedido.py`
 
-> O arquivo `pedido.py` é Responsável por registrar todos os pedidos realizados no sistema.
+> O arquivo `pedido.py` vai ser responsável por registrar todos os pedidos realizados no sistema.
 
 Essa tabela será utilizada para:
 
@@ -267,18 +258,6 @@ from app.db.base import Base
 
 
 class RequestType(str, Enum):
-    """
-    Supported request categories.
-
-    Attributes
-    ----------
-    GAS : str
-        Gas request category.
-
-    AGUA : str
-        Water request category.
-    """
-
     GAS = "gas"
     AGUA = "agua"
 
