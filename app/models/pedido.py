@@ -2,15 +2,34 @@
 Pedido model module.
 
 This module defines the database model responsible for storing
-system requests made by managers.
+requests made by managers.
 """
 
 from datetime import datetime
+from enum import Enum
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer
+from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+
+
+class RequestType(str, Enum):
+    """
+    Supported request categories.
+
+    Attributes
+    ----------
+    GAS : str
+        Gas request category.
+
+    AGUA : str
+        Water request category.
+    """
+
+    GAS = "gas"
+    AGUA = "agua"
 
 
 class Pedido(Base):
@@ -27,8 +46,8 @@ class Pedido(Base):
     gestor_id : int
         Associated manager identifier.
 
-    tipo : str
-        Request type.
+    tipo : RequestType
+        Request category.
 
     quantidade : int
         Requested quantity.
@@ -39,7 +58,11 @@ class Pedido(Base):
 
     __tablename__ = "pedidos"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
     gestor_id = Column(
         Integer,
@@ -48,7 +71,7 @@ class Pedido(Base):
     )
 
     tipo = Column(
-        String(20),
+        SqlEnum(RequestType),
         nullable=False,
     )
 

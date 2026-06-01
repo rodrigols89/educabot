@@ -254,18 +254,44 @@ Essa tabela será utilizada para:
 [pedido.py](pedido.py)
 ```python
 from datetime import datetime
+from enum import Enum
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import Enum as SqlEnum
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
+
+
+class RequestType(str, Enum):
+    """
+    Supported request categories.
+
+    Attributes
+    ----------
+    GAS : str
+        Gas request category.
+
+    AGUA : str
+        Water request category.
+    """
+
+    GAS = "gas"
+    AGUA = "agua"
 
 
 class Pedido(Base):
 
     __tablename__ = "pedidos"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
     gestor_id = Column(
         Integer,
@@ -274,7 +300,7 @@ class Pedido(Base):
     )
 
     tipo = Column(
-        String(20),
+        SqlEnum(RequestType),
         nullable=False,
     )
 
