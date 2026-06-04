@@ -5,7 +5,9 @@ Used to verify if the API is running correctly.
 
 from fastapi import APIRouter
 
-router = APIRouter()
+router = APIRouter(
+    tags=["Healthcheck"],
+)
 
 
 @router.get("/health")
@@ -23,4 +25,5 @@ def health_check():
     >>> GET /health
     {"status": "ok"}
     """
+
     return {"status": "ok"}
