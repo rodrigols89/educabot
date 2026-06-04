@@ -8,6 +8,7 @@ from fastapi import FastAPI
 
 from app.api.gestores import router as gestores_router
 from app.api.health import router as health_router
+from app.api.pedidos import router as pedidos_router
 
 app = FastAPI(
     title="WhatsApp Orders API",
@@ -16,6 +17,5 @@ app = FastAPI(
 
 
 app.include_router(gestores_router)
-# app.include_router(pedidos_router)
-# app.include_router(dashboard_router)
+app.include_router(pedidos_router)
 app.include_router(health_router)

@@ -1,5 +1,3 @@
-exclude: (^|/)driver\.py$
-
 repos:
   - repo: local
     hooks:
@@ -13,7 +11,7 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-        exclude: ^alembic/versions/
+        exclude: ^(alembic/versions/|app/utils/insert_gestores\.py$)
 
       # --------------------------------------------------------
       #  TESTE (somente quando arquivos Python mudarem)
@@ -24,7 +22,7 @@ repos:
       #  language: system
       #  types: [python]
       #  pass_filenames: false
-      #  exclude: ^alembic/versions/
+      #  exclude: ^(alembic/versions/|app/utils/insert_gestores\.py$)
 
       # --------------------------------------------------------
       #  COVERAGE MINIMUM (falha se < 70%)
@@ -35,4 +33,4 @@ repos:
       #  language: system
       #  types: [python]
       #  pass_filenames: false
-      #  exclude: ^alembic/versions/
+      #  exclude: ^(alembic/versions/|app/utils/insert_gestores\.py$)

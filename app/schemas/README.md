@@ -5,6 +5,7 @@
 ## Conteúdo
 
  - [`gestor.py`](#gestor-py)
+ - [`pedido.py`](#pedido-py)
 <!---
 [WHITESPACE RULES]
 - "20" Whitespace character.
@@ -62,6 +63,57 @@ class GestorResponse(BaseModel):
     pode_pedir_gas: bool
     pode_pedir_agua: bool
     ativo: bool
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+<div id="pedido-py"></div>
+
+## `pedido.py`
+
+> O arquivo `pedido.py` contém os modelos Pydantic usados para contratos da API de pedidos.
+
+[pedido.py](pedido.py)
+```python
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
+
+
+class PedidoCreate(BaseModel):
+
+    gestor_id: int
+    comando: str
+
+
+class PedidoResponse(BaseModel):
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    gestor_id: int
+    tipo: str
+    quantidade: int
+    criado_em: datetime
 ```
 
 ---

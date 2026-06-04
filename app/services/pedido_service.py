@@ -48,7 +48,7 @@ def create_request(
 
     Examples
     --------
-    >>> create_request(db, gestor, "/gas 1")
+    >>> create_request(db, gestor, "/gas")
     """
 
     # Parse command and extract request data

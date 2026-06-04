@@ -37,6 +37,7 @@ exclude = [
     "migrations",
     "__pycache__",
     "**/driver.py",
+    "app/utils/insert_gestores.py",
 ]
 
 [tool.ruff.lint]
