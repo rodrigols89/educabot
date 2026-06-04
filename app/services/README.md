@@ -117,22 +117,40 @@ def parse_command(command: str) -> Dict[str, int | str]:
     # Remove leading and trailing spaces
     cleaned_command = command.strip()
 
-    # Split command into parts
-    parts = cleaned_command.split()
-
-    # Extract request type and quantity
-    request_type = parts[0].replace("/", "")
-
-    # Convert quantity to integer
-    quantity = int(parts[1])
+    # Extract request type
+    request_type = cleaned_command.replace("/", "")
 
     # Return parsed request information
     return {
         "tipo": request_type,
-        "quantidade": quantity,
+        "quantidade": 1,
     }
 ```
 
+<details>
+
+<summary>Explicação Passo a Passo (Step-by-Step)</summary>
+
+<br/>
+
+```python
+# Validate command format
+if not validate_request_command(command):
+    raise ValueError("Invalid command format.")
+```
+
+Como a função `validate_request_command()` retorna:
+
+ - `True`
+   - Quando o comando é válido.
+ - `False`
+   - Quando o comando é inválido.
+
+Nós utilizamos o `if not` para que o comando seja lido como:
+
+> **"Se o comando NÃO for válido..."**
+
+</details>
 
 
 

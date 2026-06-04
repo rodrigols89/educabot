@@ -63,7 +63,8 @@ A função `validate_request_command()` vai ser responsável por validar comando
 Ela garante:
 
  - Formato válido
- - Quantidade numérica
+ - Quantidade numérica:
+   - Por enquanto, não vamos tratar isso, apenas 1 unidade por pedido será aceito por dia
  - Comando permitido
 
 ### `Código Completo`
@@ -72,8 +73,7 @@ Ela garante:
 ```python
 import re
 
-
-REQUEST_COMMAND_PATTERN = r"^\/(gas|agua)\s+\d+$"
+REQUEST_COMMAND_PATTERN = r"^\/(gas|agua)$"
 
 
 def validate_request_command(command: str) -> bool:
@@ -95,44 +95,40 @@ def validate_request_command(command: str) -> bool:
 Vamos começar entendendo o regex abaixo:
 
 ```python
-^\/(gas|agua)\s+\d+$
+r"^\/(gas|agua)$"
 ```
 
  - `^ -> início da string`
-   - Significa: *"A correspondência deve começar no início do texto."*
-   - Exemplos:
-     - ✅ Aceita = `/gas 2`
-     - ❌ Não aceita = `abc /gas 2` (porque existe texto antes do comando)
+   - ✅ Aceita = `/gas`
+   - ❌ Não aceita = `abc /gas` (porque existe texto antes do comando)
  - `\/ -> caractere "/"`
    - Representa literalmente: `/ (barra)`
    - Significa: A correspondência deve ser um caractere "/"
  - `(gas|agua) -> palavra "gas" OU "agua"`
    - Significa: Aceite `"gas"` OU `"agua"`.
    - O operador `|` funciona como um `OR`.
- - `\s+ -> um ou mais espaços`
- - `\d+ -> um ou mais números`
  - `$ -> fim da string`
 
 Continuando, vamos entender o `re.match()` que recebeu como parâmetro:
 
 > **NOTE:**  
-> A funçã `re.match()` serve para verificar se um texto corresponde a um padrão Regex.
+> A função `re.match()` serve para verificar se um texto corresponde a um padrão Regex.
 
  - `REQUEST_COMMAND_PATTERN`
-   - Padrão Regex que será utilizado na funçã `re.match()`.
+   - Padrão Regex que será utilizado na função `re.match()`.
  - `command.strip()`
    - Formata a string removendo espaços do início e do fim da string.
    - Suponha que o usuário enviou:
-     - `"   /gas 2   "`
-   - O método *command.strip()* remove espaços do início e do fim da string.
-     - `"/gas 2"`
+     - `"   /gas   "`
+   - O método `command.strip()` remove espaços do início e do fim da string.
+     - `"/gas"`
 
 > **E o retorno da função `re.match()`?**
 
  - `True`
-   - Se o comando for válido, a funçã `re.match()` retorna `True`.
+   - Se o comando for válido -> a função `re.match()` retorna `True`.
  - `False`
-   - Se o comando for inválido, a funçã `re.match()` retorna `False`
+   - Se o comando for inválido, a função `re.match()` retorna `False`
 
 > **NOTE:**  
 > Como o retorno da função é do tipo `bool`, vamos retornar `True` ou `False` com a função  `validate_request_command()`.

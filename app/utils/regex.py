@@ -6,7 +6,7 @@ Provides reusable regex validation helpers for command parsing.
 
 import re
 
-REQUEST_COMMAND_PATTERN = r"^\/(gas|agua)\s+\d+$"
+REQUEST_COMMAND_PATTERN = r"^\/(gas|agua)$"
 
 
 def validate_request_command(command: str) -> bool:
@@ -25,7 +25,7 @@ def validate_request_command(command: str) -> bool:
 
     Examples
     --------
-    >>> validate_request_command("/gas 2")
+    >>> validate_request_command("/gas")
     True
     """
 

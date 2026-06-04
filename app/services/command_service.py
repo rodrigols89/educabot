@@ -30,8 +30,8 @@ def parse_command(command: str) -> Dict[str, int | str]:
 
     Examples
     --------
-    >>> parse_command("/gas 2")
-    {"tipo": "gas", "quantidade": 2}
+    >>> parse_command("/gas")
+    {"tipo": "gas", "quantidade": 1}
     """
 
     # Validate command format
@@ -41,17 +41,11 @@ def parse_command(command: str) -> Dict[str, int | str]:
     # Remove leading and trailing spaces
     cleaned_command = command.strip()
 
-    # Split command into parts
-    parts = cleaned_command.split()
-
-    # Extract request type and quantity
-    request_type = parts[0].replace("/", "")
-
-    # Convert quantity to integer
-    quantity = int(parts[1])
+    # Extract request type
+    request_type = cleaned_command.replace("/", "")
 
     # Return parsed request information
     return {
         "tipo": request_type,
-        "quantidade": quantity,
+        "quantidade": 1,
     }
