@@ -1,13 +1,25 @@
 services:
   db:
     image: postgres:15
-    container_name: postgresql_api
+    container_name: educabot_db
     restart: always
-    env_file: .env
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  evolution:
+    image: atendai/evolution-api:v1.8.2
+    container_name: evolution_service
+    restart: always
+    env_file:
+      - .env.evolution
+    volumes:
+      - evolution_instances:/evolution/instances
+    ports:
+      - "8080:8080"
 
 volumes:
+  evolution_instances:
   postgres_data:
