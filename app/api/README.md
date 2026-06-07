@@ -396,8 +396,12 @@ Nesta etapa ainda não vamos processar comandos como:
 ```python
 from typing import Any
 
-from fastapi import APIRouter
-from fastapi import Request
+from fastapi import APIRouter, Request
+
+from app.schemas.evolution import EvolutionMessage
+from app.utils.evolution_parser import (
+    parse_evolution_message,
+)
 
 router = APIRouter(
     prefix="/webhook",
@@ -405,14 +409,36 @@ router = APIRouter(
 )
 
 
+def _log_message(
+    message: EvolutionMessage,
+) -> None:
+
+    print("\n=== EVOLUTION MESSAGE ===")
+    print(f"Phone: {message.phone}")
+    print(f"Name: {message.name}")
+    print(f"Text: {message.text}")
+    print(f"Type: {message.message_type}")
+    print(f"From Me: {message.from_me}")
+    print(f"Timestamp: {message.timestamp}")
+    print("=========================\n")
+
+
 @router.post("/evolution")
-async def evolution_webhook(request: Request) -> dict[str, str]:
+async def evolution_webhook(
+    request: Request,
+) -> dict[str, str]:
 
-    payload: Any = await request.json()
+    payload: dict[str, Any] = await request.json()
 
-    print("\n=== EVOLUTION WEBHOOK ===")
-    print(payload)
-    print("========================\n")
+    try:
+        message = parse_evolution_message(payload)
+        _log_message(message)
+
+    except Exception as exc:
+        print("\n=== EVOLUTION PARSE ERROR ===")
+        print(exc)
+        print(payload)
+        print("============================\n")
 
     return {"status": "received"}
 ```
@@ -422,6 +448,9 @@ async def evolution_webhook(request: Request) -> dict[str, str]:
 <summary>Explicação Passo a Passo (Step-by-Step)</summary>
 
 <br/>
+
+> **⚠️ NOTE:**  
+> Essa explicação é de uma versão antiga, mas vai ficar de exemplo para quem ler entender como o endpoint foi pensado.
 
 ```python
 async def evolution_webhook(request: Request) -> dict[str, str]:

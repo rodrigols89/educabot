@@ -4,12 +4,91 @@
 
 ## Conteúdo
 
+ - [`evolution.py`](#evolution-py)
  - [`gestor.py`](#gestor-py)
  - [`pedido.py`](#pedido-py)
 <!---
 [WHITESPACE RULES]
 - "20" Whitespace character.
 --->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+<div id="evolution-py"></div>
+
+## `evolution.py`
+
+> O arquivo `evolution.py` será responsável por transformar o payload complexo enviado pela Evolution API em um objeto simples e tipado.
+
+Atualmente o webhook recebe algo parecido com:
+
+```json
+{
+  "event": "messages.upsert",
+  "data": {
+    "key": {
+      "remoteJid": "5583999999999@s.whatsapp.net"
+    },
+    "pushName": "Maria Silva",
+    "message": {
+      "conversation": "/gas"
+    },
+    "messageTimestamp": 1749110000
+  }
+}
+```
+
+Sem schema você precisaria fazer:
+
+```python
+payload["data"]["key"]["remoteJid"]
+payload["data"]["message"]["conversation"]
+```
+
+Com o schema:
+
+```python
+webhook.phone
+webhook.message
+webhook.name
+webhook.timestamp
+```
+
+[evolution.py](evolution.py)
+```python
+from datetime import datetime
+
+from pydantic import BaseModel, Field
+
+
+class EvolutionMessage(BaseModel):
+
+    phone: str = Field(...)
+    text: str = Field(...)
+    name: str | None = None
+    timestamp: datetime
+    from_me: bool
+    message_type: str
+```
 
 
 

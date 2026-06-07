@@ -10,11 +10,118 @@ Por, exemplo:
 
 ## Conteúdo
 
+ - [`evolution_parser.py`](#evolution-parser-py)
  - [`regex.py`](#regex-py)
+   - [`validate_request_command()`](#validate-request-command)
 <!---
 [WHITESPACE RULES]
 - "20" Whitespace character.
 --->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+<div id="evolution-parser-py"></div>
+
+## `evolution_parser.py`
+
+> O arquivo `evolution_parser.py` conterá funções utilitárias para converter payloads da Evolution em schemas internos da aplicação.
+
+Criamos em `/utils` porque futuramente essa lógica poderá ser reutilizada por:
+
+ - webhook
+ - testes
+ - workers
+ - processamento assíncrono
+
+[evolution_parser.py](evolution_parser.py)
+```python
+from datetime import UTC, datetime
+from typing import Any
+
+from app.schemas.evolution import EvolutionMessage
+
+
+def extract_message_text(
+    message_data: dict[str, Any],
+) -> str:
+
+    if "conversation" in message_data:
+        return message_data["conversation"]
+
+    if "extendedTextMessage" in message_data:
+        return (
+            message_data["extendedTextMessage"]
+            .get("text", "")
+        )
+
+    return ""
+
+
+def parse_evolution_message(
+    payload: dict[str, Any],
+) -> EvolutionMessage:
+
+    data: dict[str, Any] = payload["data"]
+
+    sender: str = payload.get(
+        "sender",
+        "",
+    )
+
+    phone: str = sender.replace(
+        "@s.whatsapp.net",
+        "",
+    )
+
+    text: str = extract_message_text(
+        data["message"]
+    )
+
+    return EvolutionMessage(
+        phone=phone,
+        text=text,
+        name=data.get("pushName"),
+        timestamp=datetime.fromtimestamp(
+            data["messageTimestamp"],
+            tz=UTC,
+        ),
+        from_me=data["key"]["fromMe"],
+        message_type=data["messageType"],
+    )
+```
+
+Se tudo ocorrer bem você receberá uma mensagem parecida com essa no terminal quando alguém ou você enviar uma mensagem:
+
+**OUTPUT:**
+```bash
+=== EVOLUTION MESSAGE ===
+Phone: 558393885557
+Name: Rodrigo Leite 😎
+Text: Aqueles códigos eu não te mandei aqui? Sumiram!
+Type: extendedTextMessage
+From Me: True
+Timestamp: 2026-06-07 15:26:34+00:00
+=========================
+```
 
 
 
@@ -53,7 +160,7 @@ Por, exemplo:
 
 <div id="validate-request-command"></div>
 
-## `validate_request_command`
+## `validate_request_command()`
 
 A função `validate_request_command()` vai ser responsável por validar comandos como:
 
