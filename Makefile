@@ -36,6 +36,7 @@ PRECOMMIT := $(VENV)/bin/pre-commit
 		test post_test \
 		export_dev export_prod \
 		start_compose down_compose restart_compose build_compose clean_compose \
+		open_db open_evolution \
 		server check_server kill_server
 
 
@@ -104,6 +105,15 @@ clean_compose:
 	docker rmi -f $$(docker images -aq) 2>/dev/null || true
 	docker volume rm $$(docker volume ls -q) 2>/dev/null || true
 	docker system prune -a --volumes -f
+
+
+# ------------------------------- ( Docker Exec ) ---------------------------
+
+open_db:
+	docker exec -it educabot_db bash
+
+open_evolution:
+	docker exec -it evolution_service sh
 
 
 # ------------------------------- ( Servers ) -------------------------------

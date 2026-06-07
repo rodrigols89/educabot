@@ -11,6 +11,7 @@
    - [`list_managers`](#list-managers)
  - [`health.py`](#health-py)
  - [`pedidos.py`](#pedidos-py)
+ - [`webhook.py`](#webhook-py)
 <!---
 [WHITESPACE RULES]
 - "20" Whitespace character.
@@ -345,6 +346,249 @@ def list_requests(
 
     return db.query(Pedido).all()
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+<div id="webhook-py"></div>
+
+## `webhook.py`
+
+> O arquivo `webhook.py` será responsável por *receber os eventos enviados pela Evolution API*.
+
+Sempre que alguém enviar uma mensagem para o WhatsApp conectado à Evolution, a Evolution fará uma requisição HTTP para sua API:
+
+```bash
+WhatsApp
+    ↓
+Evolution API
+    ↓
+POST /webhook/evolution
+    ↓
+FastAPI
+```
+
+Nesta etapa ainda não vamos processar comandos como:
+
+ - `/agua`
+ - `/gas`
+
+> **NOTE:**  
+> O objetivo é apenas confirmar que a comunicação entre Evolution e FastAPI está funcionando.
+
+[webhook.py](webhook.py)
+```python
+from typing import Any
+
+from fastapi import APIRouter
+from fastapi import Request
+
+router = APIRouter(
+    prefix="/webhook",
+    tags=["Webhook"],
+)
+
+
+@router.post("/evolution")
+async def evolution_webhook(request: Request) -> dict[str, str]:
+
+    payload: Any = await request.json()
+
+    print("\n=== EVOLUTION WEBHOOK ===")
+    print(payload)
+    print("========================\n")
+
+    return {"status": "received"}
+```
+
+<details>
+
+<summary>Explicação Passo a Passo (Step-by-Step)</summary>
+
+<br/>
+
+```python
+async def evolution_webhook(request: Request) -> dict[str, str]:
+
+    ...
+
+    return {"status": "received"}
+```
+
+No código acima nós vamos receber uma requisiçaõ `Request` e retornar um dicionário de strings na *chave* e *valor*.
+
+```python
+payload: Any = await request.json()
+```
+
+No código acima nós estamos:
+
+1. Lendo o corpo da requisição HTTP recebida.
+2. Convertendo o JSON enviado para um objeto Python (normalmente um `dict`).
+3. Armazenando o resultado na variável `payload`.
+
+> **O que significa `await`?**
+
+A leitura do corpo da requisição é uma operação assíncrona. O `await` diz:
+
+> **"Espere o FastAPI terminar de ler e converter o JSON antes de continuar a execução."**
+
+Por isso a função também precisa ser:
+
+```python
+async def evolution_webhook(...)
+```
+
+> **O que é um Payload?**
+
+**Payload** é o conteúdo principal enviado em uma requisição ou resposta.
+
+Imagine uma carta:
+
+* Endereço → cabeçalhos HTTP (`headers`)
+* Envelope → requisição HTTP
+* Carta dentro do envelope → payload
+
+Exemplo:
+
+```http
+POST /webhook/evolution
+Content-Type: application/json
+```
+
+Payload:
+
+```json
+{
+  "event": "messages.upsert",
+  "instance": "EducaBot",
+  "message": "/gas"
+}
+```
+
+Tudo que está dentro desse JSON é o **payload**.
+
+### `Exemplo completo`
+
+Se a Evolution API enviar:
+
+```json
+{
+  "event": "messages.upsert",
+  "sender": "5583999999999",
+  "message": "/agua"
+}
+```
+
+Quando o código executar:
+
+```python
+payload: Any = await request.json()
+```
+
+o resultado será:
+
+```python
+payload = {
+    "event": "messages.upsert",
+    "sender": "5583999999999",
+    "message": "/agua"
+}
+```
+
+E você poderá acessar os dados assim:
+
+```python
+evento = payload["event"]
+telefone = payload["sender"]
+mensagem = payload["message"]
+```
+
+Resultado:
+
+```python
+evento = "messages.upsert"
+telefone = "5583999999999"
+mensagem = "/agua"
+```
+
+### `Teste manual`
+
+Envie um payload fake:
+
+```bash
+curl -X POST \
+  http://localhost:8000/webhook/evolution \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "messages.upsert",
+    "data": {
+      "message": "Olá"
+    }
+  }'
+```
+
+**OUTPUT:**
+```bash
+{"status":"received"}
+```
+
+**TERMINAL:**
+```bash
+=== EVOLUTION WEBHOOK ===
+{'event': 'messages.upsert', 'data': {'message': 'Olá'}}
+========================
+
+INFO:     127.0.0.1:56258 - "POST /webhook/evolution HTTP/1.1" 200 OK
+```
+
+> **NOTE:**  
+> Veham que nós enviamos uma requisição `POST` para a URL `/webhook/evolution` e recebemos uma resposta `200 OK`.
+
+### `Configurando o Webhook no painel do Evolution`
+
+```python
+print("\n=== EVOLUTION WEBHOOK ===")
+print(payload)
+print("========================\n")
+```
+
+Se você prestou bem atenção (e entendeu) no código acima saberá que esse `print(payload)` irá imprimir sempre um corpo de uma requisição no formato JSON no terminal.
+
+Sabendo disso, nós vamos linkar (configurar) um webhook no painel do Evolution para ouvir tudo o que for recebido e enviado pelo telefone cadastrado nesse endpoint:
+
+![img](images/webhook-01.png)  
+
+Na imagem acima:
+
+ - `http://172.17.0.1:8000`
+   - Se refere ao nosso IP Local.
+ - `/webhook/evolution`
+   - Se refere ao nosso endpoint `/webhook/evolution`.
+ - `MESSAGES.UPSERT`
+   - Se refere ao evento que queremos ouvir.
+
+Agora tudo o que for digitado no número registrado será impresso no terminal:
+
+![img](images/webhook-02.png)  
+
+</details>
 
 ---
 
