@@ -37,7 +37,9 @@ PRECOMMIT := $(VENV)/bin/pre-commit
 		export_dev export_prod \
 		start_compose down_compose restart_compose build_compose clean_compose \
 		open_db open_evolution \
-		server check_server kill_server
+		server check_server kill_server \
+		init_project init_service \
+		service_status service_stop service_restart service_logs
 
 
 # ------------------------------- ( Linting ) -------------------------------
@@ -131,3 +133,33 @@ check_server:
 kill_server:
 	kill $$(lsof -t -i:8000) 2>/dev/null || true
 	pkill -f "uvicorn app.main:app" 2>/dev/null || true
+
+
+# -------------------------- ( Initialization Scripts ) ---------------------
+
+init_project:
+	cd $(ROOT)
+	bash scripts/init_project.sh
+
+init_service:
+	cd $(ROOT)
+	bash scripts/init_service.sh
+
+
+# ------------------------------ ( Service Status ) -------------------------
+
+service_status:
+	cd $(ROOT)
+	systemctl status educabot.service
+
+service_stop:
+	cd $(ROOT)
+	systemctl stop educabot.service
+
+service_restart:
+	cd $(ROOT)
+	systemctl restart educabot.service
+
+service_logs:
+	cd $(ROOT)
+	journalctl -u educabot.service -f
