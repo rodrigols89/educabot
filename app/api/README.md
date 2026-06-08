@@ -11,6 +11,7 @@
    - [`list_managers`](#list-managers)
  - [`health.py`](#health-py)
  - [`pedidos.py`](#pedidos-py)
+ - [`test_evolution.py`](#test-evolution-py)
  - [`webhook.py`](#webhook-py)
 <!---
 [WHITESPACE RULES]
@@ -346,6 +347,99 @@ def list_requests(
 
     return db.query(Pedido).all()
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+<div id="test-evolution-py"></div>
+
+## `test_evolution.py`
+
+> O arquivo `test_evolution.py` disponibiliza endpoints temporários para validar a integração do **FastAPI** com o serviço **Evolution API** antes da implementação dos fluxos reais do WhatsApp.
+
+[test_evolution.py](test_evolution.py)
+```python
+from fastapi import APIRouter
+from pydantic import BaseModel
+
+from app.clients.evolution_client import (
+    send_text_message,
+)
+
+router = APIRouter(
+    prefix="/test",
+    tags=["Test"],
+)
+
+
+class SendMessageRequest(BaseModel):
+
+    phone: str
+    text: str
+
+
+@router.post("/send-message")
+def test_send_message(
+    payload: SendMessageRequest,
+) -> dict:
+    return send_text_message(
+        phone=payload.phone,
+        text=payload.text,
+    )
+```
+
+<details>
+
+<summary>Teste</summary>
+
+<br/>
+
+Para testar se esse endpoint consegue de fato enviar uma mensagem para um determinado número (diferente do registrado no Evolution API) vamos enviar o seguinte JSON para a rota `http://localhost:8000/test/send-message` (no Postman):
+
+```bash
+{
+    "phone": "5583996241663",
+    "text": "Mensagem enviada pela FastAPI"
+}
+```
+
+**NO TERMINAL (NO SERVIDOR DO FASTAPI):**
+```bash
+=== EVOLUTION RESPONSE ===
+201
+{"key":{"remoteJid":"558396241663@s.whatsapp.net","fromMe":true,"id":"3EB0F7DC69985002D30189"},"message":{"extendedTextMessage":{"text":"Mensagem enviada pela FastAPI"}},"messageTimestamp":"1780875412","status":"PENDING"}
+==========================
+
+INFO:     127.0.0.1:36104 - "POST /test/send-message HTTP/1.1" 200 OK
+```
+
+**SAÍDA DO POSTMAN:**
+```json
+{"key":{"remoteJid":"558396241663@s.whatsapp.net","fromMe":true,"id":"3EB0F7DC69985002D30189"},"message":{"extendedTextMessage":{"text":"Mensagem enviada pela FastAPI"}},"messageTimestamp":"1780875412","status":"PENDING"}
+```
+
+**NO WHATSAPP:**
+```bash
+Mensagem enviada pela FastAPI
+```
+
+</details>
 
 
 

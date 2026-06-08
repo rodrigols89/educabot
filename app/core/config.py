@@ -20,10 +20,36 @@ class Settings:
     ----------
     DATABASE_URL : str
         Database connection string.
+
+    EVOLUTION_API_URL : str
+        Evolution API base URL.
+
+    EVOLUTION_INSTANCE : str
+        Evolution instance name.
+
+    EVOLUTION_API_KEY : str
+        Evolution API authentication key.
     """
 
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "",
+    )
+
+    EVOLUTION_API_URL: str = os.getenv(
+        "EVOLUTION_API_URL",
+        "",
+    )
+
+    EVOLUTION_INSTANCE: str = os.getenv(
+        "EVOLUTION_INSTANCE",
+        "",
+    )
+
+    EVOLUTION_API_KEY: str = os.getenv(
+        "EVOLUTION_API_KEY",
+        "",
+    )
 
 
-# Settings class instance
 settings = Settings()

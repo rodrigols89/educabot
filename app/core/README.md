@@ -36,22 +36,13 @@
 
 ## `config.py`
 
-O módulo `config.py` é responsável por carregar variáveis de ambiente e centralizar configurações do projeto.
+> O arquivo `config.py` centraliza todas as configurações da aplicação carregadas a partir dos arquivos `.env`.
 
+Ele fornece acesso a:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+ - PostgreSQL
+ - Evolution API
+ - futuras configurações do sistema
 
 
 
@@ -79,14 +70,30 @@ load_dotenv()
 
 class Settings:
 
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "",
+    )
+
+    EVOLUTION_API_URL: str = os.getenv(
+        "EVOLUTION_API_URL",
+        "",
+    )
+
+    EVOLUTION_INSTANCE: str = os.getenv(
+        "EVOLUTION_INSTANCE",
+        "",
+    )
+
+    EVOLUTION_API_KEY: str = os.getenv(
+        "EVOLUTION_API_KEY",
+        "",
+    )
 
 
-# Settings class instance
 settings = Settings()
 ```
 
 ---
-
 
 **Rodrigo** **L**eite da **S**ilva - **rodrigols89**
