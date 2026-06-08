@@ -9,6 +9,9 @@ from typing import Any
 from fastapi import APIRouter, Request
 
 from app.schemas.evolution import EvolutionMessage
+from app.services.message_processor_service import (
+    process_message,
+)
 from app.utils.evolution_parser import (
     parse_evolution_message,
 )
@@ -38,6 +41,7 @@ def _log_message(
     --------
     >>> _log_message(message)
     """
+
     print("\n=== EVOLUTION MESSAGE ===")
     print(f"Phone: {message.phone}")
     print(f"Name: {message.name}")
@@ -70,11 +74,16 @@ async def evolution_webhook(
     >>> POST /webhook/evolution
     {'status': 'received'}
     """
+
     payload: dict[str, Any] = await request.json()
 
     try:
         message = parse_evolution_message(payload)
         _log_message(message)
+        result: str = process_message(message)
+        print(
+            f"Processor Result: {result}"
+        )
 
     except Exception as exc:
         print("\n=== EVOLUTION PARSE ERROR ===")

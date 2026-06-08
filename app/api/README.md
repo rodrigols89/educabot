@@ -493,6 +493,9 @@ from typing import Any
 from fastapi import APIRouter, Request
 
 from app.schemas.evolution import EvolutionMessage
+from app.services.message_processor_service import (
+    process_message,
+)
 from app.utils.evolution_parser import (
     parse_evolution_message,
 )
@@ -527,6 +530,10 @@ async def evolution_webhook(
     try:
         message = parse_evolution_message(payload)
         _log_message(message)
+        result: str = process_message(message)
+        print(
+            f"Processor Result: {result}"
+        )
 
     except Exception as exc:
         print("\n=== EVOLUTION PARSE ERROR ===")
