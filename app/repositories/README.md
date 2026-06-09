@@ -73,8 +73,6 @@ Banco de Dados
 
 [gestor_repository.py](gestor_repository.py)
 ```python
-from typing import Optional
-
 from sqlalchemy.orm import Session
 
 from app.models.gestor import Gestor
@@ -83,13 +81,14 @@ from app.models.gestor import Gestor
 def get_gestor_by_phone(
     db: Session,
     phone: str,
-) -> Optional[Gestor]:
+) -> Gestor | None:
 
     return (
         db.query(Gestor)
-        .filter(Gestor.telefone == phone)
+        .filter(Gestor.phone == phone)
         .first()
     )
+
 ```
 
 

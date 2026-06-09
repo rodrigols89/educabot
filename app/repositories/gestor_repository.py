@@ -1,10 +1,8 @@
 """
-Gestor repository module.
+Gestor repository.
 
-Provides database operations related to managers.
+Provides database access methods for Gestor entities.
 """
-
-from typing import Optional
 
 from sqlalchemy.orm import Session
 
@@ -14,26 +12,29 @@ from app.models.gestor import Gestor
 def get_gestor_by_phone(
     db: Session,
     phone: str,
-) -> Optional[Gestor]:
+) -> Gestor | None:
     """
-    Retrieve manager by phone number.
+    Find gestor by phone number.
 
     Parameters
     ----------
     db : Session
-        Active database session.
+        Database session.
 
     phone : str
-        Manager phone number.
+        WhatsApp phone number.
 
     Returns
     -------
-    Optional[Gestor]
-        Manager instance if found.
+    Gestor | None
+        Found gestor or None.
 
     Examples
     --------
-    >>> get_gestor_by_phone(db, "+558399999999")
+    >>> get_gestor_by_phone(
+    ...     db,
+    ...     "5583999999999"
+    ... )
     """
 
     return (
