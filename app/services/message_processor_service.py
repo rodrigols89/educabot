@@ -1,9 +1,7 @@
 # app/services/message_processor_service.py
+
 """
 Message processing service.
-
-Handles incoming WhatsApp messages and
-routes them to business rules.
 """
 
 from sqlalchemy.orm import Session
@@ -12,6 +10,9 @@ from app.repositories.gestor_repository import (
     get_gestor_by_phone,
 )
 from app.schemas.evolution import EvolutionMessage
+from app.services.pedido_service import (
+    create_request,
+)
 
 
 def process_message(
@@ -20,31 +21,8 @@ def process_message(
 ) -> str:
     """
     Process incoming WhatsApp message.
-
-    Parameters
-    ----------
-    db : Session
-        Database session.
-
-    message : EvolutionMessage
-        Parsed Evolution message.
-
-    Returns
-    -------
-    str
-        Processing result message.
-
-    Examples
-    --------
-    >>> process_message(db, message)
-    'Command received'
     """
 
-    # Ignore messages sent by ourselves
-    if message.from_me:
-        return "Ignored own message"
-
-    # Ignore empty messages
     if not message.text:
         return "Empty message"
 
@@ -59,11 +37,20 @@ def process_message(
             "in the system"
         )
 
-    # Command detection
-    if message.text.startswith("/"):
-        return (
-            f"Command received from "
-            f"{gestor.nome}"
+    if not message.text.startswith("/"):
+        return "Not a command"
+
+    try:
+        pedido = create_request(
+            db=db,
+            gestor=gestor,
+            command=message.text,
         )
 
-    return "Not a command"
+        return (
+            f"Request #{pedido.id} "
+            f"created successfully"
+        )
+
+    except ValueError as exc:
+        return str(exc)

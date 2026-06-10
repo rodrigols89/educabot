@@ -1,8 +1,10 @@
 """
 Evolution payload parsing utilities.
+
+Converts Evolution API payloads into
+internal message objects used by the system.
 """
 
-from datetime import UTC, datetime
 from typing import Any
 
 from app.schemas.evolution import EvolutionMessage
@@ -23,7 +25,15 @@ def extract_message_text(
     -------
     str
         Extracted text.
+
+    Examples
+    --------
+    >>> extract_message_text(
+    ...     {"conversation": "Hello"}
+    ... )
+    'Hello'
     """
+
     if "conversation" in message_data:
         return message_data["conversation"]
 
@@ -38,7 +48,7 @@ def extract_message_text(
 
 def parse_evolution_message(
     payload: dict[str, Any],
-) -> EvolutionMessage:
+) -> EvolutionMessage | None:
     """
     Parse Evolution webhook payload.
 
@@ -49,19 +59,29 @@ def parse_evolution_message(
 
     Returns
     -------
-    EvolutionMessage
+    EvolutionMessage | None
         Normalized message object.
+
+    Notes
+    -----
+    Messages sent by the instance owner
+    are ignored and return None.
 
     Examples
     --------
-    >>> message = parse_evolution_message(payload)
-    >>> message.phone
-    '5583999999999'
+    >>> parse_evolution_message(payload)
     """
+
     data: dict[str, Any] = payload["data"]
 
-    sender: str = payload.get(
-        "sender",
+    from_me: bool = data["key"]["fromMe"]
+
+    # Ignore messages sent by ourselves
+    if from_me:
+        return None
+
+    sender: str = data["key"].get(
+        "senderPn",
         "",
     )
 
@@ -77,11 +97,4 @@ def parse_evolution_message(
     return EvolutionMessage(
         phone=phone,
         text=text,
-        name=data.get("pushName"),
-        timestamp=datetime.fromtimestamp(
-            data["messageTimestamp"],
-            tz=UTC,
-        ),
-        from_me=data["key"]["fromMe"],
-        message_type=data["messageType"],
     )

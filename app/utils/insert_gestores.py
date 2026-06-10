@@ -21,13 +21,6 @@ GESTORES = [
         "pode_pedir_agua": True,
     },
     {
-        "nome": "Rodrigo (Coordenador)",
-        "telefone": "558399388-5557",
-        "escola": "Secretaria de Educação",
-        "pode_pedir_gas": True,
-        "pode_pedir_agua": True,
-    },
-    {
         "nome": "Matheus Melo (Recepcionista)",
         "telefone": "5583993858828",
         "escola": "Secretaria de Educação",

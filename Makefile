@@ -112,7 +112,7 @@ clean_compose:
 # ------------------------------- ( Docker Exec ) ---------------------------
 
 open_db:
-	docker exec -it educabot_db bash
+	docker exec -it educabot_db psql -U educabotuser -d educabot_db
 
 open_evolution:
 	docker exec -it evolution_service sh

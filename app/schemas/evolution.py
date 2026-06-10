@@ -1,12 +1,8 @@
 """
-Evolution webhook schemas.
-
-Provides normalized schemas for Evolution API payloads.
+Evolution message schemas.
 """
 
-from datetime import datetime
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class EvolutionMessage(BaseModel):
@@ -19,24 +15,8 @@ class EvolutionMessage(BaseModel):
         Sender phone number.
 
     text : str
-        Extracted message text.
-
-    name : str | None
-        Sender display name.
-
-    timestamp : datetime
-        Message timestamp.
-
-    from_me : bool
-        Indicates if message was sent by the connected account.
-
-    message_type : str
-        Evolution message type.
+        Message content.
     """
 
-    phone: str = Field(...)
-    text: str = Field(...)
-    name: str | None = None
-    timestamp: datetime
-    from_me: bool
-    message_type: str
+    phone: str
+    text: str

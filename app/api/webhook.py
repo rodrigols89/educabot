@@ -1,3 +1,4 @@
+# app/api/webhook.py
 """
 Evolution webhook endpoints.
 
@@ -9,7 +10,6 @@ from typing import Any
 from fastapi import APIRouter, Request
 
 from app.db.session import SessionLocal
-from app.schemas.evolution import EvolutionMessage
 from app.services.message_processor_service import (
     process_message,
 )
@@ -23,34 +23,58 @@ router = APIRouter(
 )
 
 
-def _log_message(
-    message: EvolutionMessage,
+def print_processor_result(
+    result: str,
 ) -> None:
     """
-    Log normalized Evolution message.
-
-    Parameters
-    ----------
-    message : EvolutionMessage
-        Parsed webhook message.
-
-    Returns
-    -------
-    None
-
-    Examples
-    --------
-    >>> _log_message(message)
+    Print processor result.
     """
 
-    print("\n---------------------------------------------------------------")
-    print("\n=== EVOLUTION MESSAGE ===")
-    print(f"Phone: {message.phone}")
-    print(f"Name: {message.name}")
-    print(f"Text: {message.text}")
-    print(f"Type: {message.message_type}")
-    print(f"From Me: {message.from_me}")
-    print(f"Timestamp: {message.timestamp}")
+    print(
+        "\n========================================"
+    )
+    print("PROCESSOR RESULT")
+    print("========================================")
+    print(result)
+    print(
+        "========================================\n"
+    )
+
+
+def process_webhook_message(
+    message: Any,
+) -> str:
+    """
+    Process incoming message.
+    """
+
+    db = SessionLocal()
+
+    try:
+        return process_message(
+            db=db,
+            message=message,
+        )
+    finally:
+        db.close()
+
+
+def print_webhook_error(
+    exc: Exception,
+) -> None:
+    """
+    Print webhook error.
+    """
+
+    print(
+        "\n========================================"
+    )
+    print("WEBHOOK ERROR")
+    print("========================================")
+    print(exc)
+    print(
+        "========================================\n"
+    )
 
 
 @router.post("/evolution")
@@ -78,29 +102,38 @@ async def evolution_webhook(
 
     payload: dict[str, Any] = await request.json()
 
-    db = SessionLocal()
+    print(
+        "\n========================================"
+    )
+    print("EVOLUTION PAYLOAD")
+    print("========================================")
+    print(payload)
+    print(
+        "========================================\n"
+    )
 
     try:
-        message = parse_evolution_message(payload)
-
-        _log_message(message)
-
-        result: str = process_message(
-            db=db,
-            message=message,
+        message = parse_evolution_message(
+            payload
         )
 
-        print(
-            f"Processor Result: {result}"
+        # Ignore messages sent by ourselves
+        if message is None:
+            return {
+                "status": "ignored"
+            }
+
+        result: str = process_webhook_message(
+            message
+        )
+
+        print_processor_result(
+            result
         )
 
     except Exception as exc:
-        print("\n=== EVOLUTION ERROR ===")
-        print(exc)
-        print(payload)
-        print("=======================\n")
+        print_webhook_error(exc)
 
-    finally:
-        db.close()
-
-    return {"status": "received"}
+    return {
+        "status": "received"
+    }
