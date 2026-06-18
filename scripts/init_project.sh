@@ -314,3 +314,73 @@ done
 echo "  ✅  PostgreSQL is ready."
 
 print_separator
+
+
+
+
+
+# ============================================================================
+# Execução das migrations do banco de dados
+#
+# Aplica todas as migrations pendentes utilizando o Alembic.
+#
+# Objetivo:
+# - Criar tabelas.
+# - Atualizar estruturas existentes.
+# - Garantir que o banco esteja compatível com a versão atual
+#   da aplicação.
+#
+# Equivalente a:
+#
+# alembic upgrade head
+# ============================================================================
+
+echo "  🔄  Running migrations..."
+
+"$VENV_ALEMBIC" upgrade head
+
+echo "  ✅  Migrations complete."
+
+print_separator
+
+
+
+
+
+# ============================================================================
+# Inserção dos gestores padrão
+#
+# Popula a tabela gestores com os registros iniciais do sistema.
+#
+# Caso um gestor já exista, o script deve ignorá-lo para evitar
+# duplicidades.
+# ============================================================================
+
+echo "  👥  Inserting managers..."
+
+"$VENV_PYTHON" -m app.utils.insert_gestores
+
+echo "  ✅  Managers inserted."
+
+print_separator
+
+
+
+
+
+# ============================================================================
+# Finalização
+#
+# Exibe uma mensagem indicando que toda a preparação do ambiente
+# foi concluída com sucesso.
+#
+# Após esta etapa a aplicação já está pronta para ser executada.
+# ============================================================================
+
+echo ""
+echo "  🎉  Project initialization complete!"
+echo ""
+echo "  You can now run:"
+echo ""
+echo "  make server"
+echo ""

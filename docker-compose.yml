@@ -1,15 +1,18 @@
 services:
   postgres:
     image: postgres:15
-    container_name: educabot_db
+    container_name: educabot_postgres
     restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     networks:
-      - evolution-net
+      - educabot-net
     command: ["postgres", "-c", "max_connections=1000"]
-    env_file:
-      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
     expose:
@@ -19,7 +22,7 @@ services:
     container_name: educabot_redis
     restart: always
     networks:
-      - evolution-net
+      - educabot-net
     command: >
       redis-server --port 6379 --appendonly yes
     env_file:
@@ -33,9 +36,9 @@ services:
     container_name: educabot_evolution
     restart: always
     networks:
-      - evolution-net
+      - educabot-net
     env_file:
-      - .env.evolution
+      - .env
     volumes:
       - evolution_data:/evolution/instances
     ports:
@@ -50,6 +53,6 @@ volumes:
   evolution_data:
 
 networks:
-  evolution-net:
-    name: evolution-net
+  educabot-net:
+    name: educabot-net
     driver: bridge
