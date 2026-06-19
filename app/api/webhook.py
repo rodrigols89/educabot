@@ -11,6 +11,9 @@ from app.services.command_service import (
 from app.services.gestor_service import (
     find_gestor,
 )
+from app.services.pedido_service import (
+    save_request,
+)
 from app.utils.evolution_parser import (
     parse_evolution_message,
 )
@@ -40,6 +43,14 @@ async def evolution_webhook(
     )
 
     if not is_command:
+
+        print(
+            "COMANDO INVÁLIDO OU IGNORADO"
+        )
+        print(
+            "========================================\n"
+        )
+
         return {
             "status": "received"
         }
@@ -47,35 +58,81 @@ async def evolution_webhook(
     db = SessionLocal()
 
     try:
+
         gestor = find_gestor(
             db=db,
             phone=phone,
         )
+
         if gestor is None:
 
             print(
-                "RESPONSÁVEL PELO PEDIDO NÃO ENCONTRADO:"
+                "RESPONSÁVEL PELO PEDIDO NÃO ENCONTRADO"
             )
             print(
                 f"Telefone: {phone}"
             )
+            print(
+                "========================================\n"
+            )
+
+            return {
+                "status": "received"
+            }
+
+        print(
+            "RESPONSÁVEL PELO PEDIDO ENCONTRADO"
+        )
+        print(
+            f"Nome: {gestor.nome}"
+        )
+        print(
+            f"Telefone: {gestor.telefone}"
+        )
+        print(
+            f"Instituição: {gestor.instituicao}"
+        )
+
+        pedido = save_request(
+            db=db,
+            gestor=gestor,
+            command=text,
+        )
+
+        if pedido is None:
+
+            print(
+                "\nPEDIDO JÁ REALIZADO HOJE"
+            )
+            print(
+                f"Gestor: {gestor.nome}"
+            )
+            print(
+                f"Tipo: {text}"
+            )
+
         else:
+
             print(
-                "RESPONSÁVEL PELO PEDIDO ENCONTRADO:"
+                "\nPEDIDO SALVO"
             )
             print(
-                f"Nome: {gestor.nome}"
+                f"Pedido ID: {pedido.id}"
             )
             print(
-                f"Telefone: {gestor.telefone}"
+                f"Gestor ID: {pedido.gestor_id}"
             )
             print(
-                f"Escola: {gestor.escola}"
+                f"Tipo: {pedido.tipo.value}"
+            )
+            print(
+                f"Criado em: {pedido.criado_em}"
             )
 
         print(
             "========================================\n"
         )
+
     finally:
         db.close()
 

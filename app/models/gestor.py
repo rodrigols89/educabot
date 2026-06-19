@@ -1,4 +1,11 @@
-from sqlalchemy import Boolean, Column, Integer, String
+# app/models/gestor.py
+
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Integer,
+    String,
+)
 
 from app.db.base import Base
 
@@ -7,9 +14,16 @@ class Gestor(Base):
 
     __tablename__ = "gestores"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
-    nome = Column(String(255), nullable=False)
+    nome = Column(
+        String(255),
+        nullable=False,
+    )
 
     telefone = Column(
         String(20),
@@ -18,7 +32,10 @@ class Gestor(Base):
         index=True,
     )
 
-    escola = Column(String(255), nullable=False)
+    instituicao = Column(
+        String(255),
+        nullable=False,
+    )
 
     pode_pedir_gas = Column(
         Boolean,
