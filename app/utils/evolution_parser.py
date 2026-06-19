@@ -1,6 +1,4 @@
-"""
-Evolution payload parsing utilities.
-"""
+# app/utils/evolution_parser.py
 
 from typing import Any
 
@@ -8,25 +6,6 @@ from typing import Any
 def parse_evolution_message(
     payload: dict[str, Any],
 ) -> tuple[str | None, str | None]:
-    """
-    Extract phone number and message text
-    from Evolution payload.
-
-    Parameters
-    ----------
-    payload : dict[str, Any]
-        Raw Evolution payload.
-
-    Returns
-    -------
-    tuple[str | None, str | None]
-        Phone number and message text.
-
-    Examples
-    --------
-    >>> parse_evolution_message(payload)
-    ("5583999999999", "/gas")
-    """
 
     data: dict[str, Any] = payload.get(
         "data",
@@ -61,6 +40,7 @@ def parse_evolution_message(
         print("========================================")
         print("Your (True)")
         print(f"Text: {text}")
+        print("========================================\n")
 
         return None, None
 
@@ -79,5 +59,8 @@ def parse_evolution_message(
     print("========================================")
     print(f"Phone: {phone}")
     print(f"Text: {text}")
+    print(
+        "========================================"
+    )
 
     return phone, text
