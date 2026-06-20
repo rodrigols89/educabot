@@ -1,3 +1,5 @@
+# app/core/config.py
+
 import os
 
 from dotenv import load_dotenv
@@ -39,6 +41,16 @@ class Settings:
 
     CACHE_REDIS_PREFIX_KEY: str = os.getenv(
         "CACHE_REDIS_PREFIX_KEY",
+        "",
+    )
+
+    EVOLUTION_API_URL: str = os.getenv(
+        "EVOLUTION_API_URL",
+        "http://localhost:8080",
+    )
+
+    EVOLUTION_INSTANCE: str = os.getenv(
+        "EVOLUTION_INSTANCE",
         "",
     )
 

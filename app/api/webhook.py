@@ -8,8 +8,14 @@ from app.db.session import SessionLocal
 from app.services.command_service import (
     is_valid_command,
 )
+from app.services.evolution_service import (
+    send_text_message,
+)
 from app.services.gestor_service import (
     find_gestor,
+)
+from app.services.notification_service import (
+    build_supplier_message,
 )
 from app.services.pedido_service import (
     save_request,
@@ -128,6 +134,40 @@ async def evolution_webhook(
             print(
                 f"Criado em: {pedido.criado_em}"
             )
+
+            supplier_phone, message = (
+                build_supplier_message(
+                    gestor=gestor,
+                    tipo=pedido.tipo,
+                )
+            )
+
+            sent = send_text_message(
+                phone=supplier_phone,
+                message=message,
+            )
+
+            print(
+                "\nENVIO PARA FORNECEDOR"
+            )
+            print(
+                "========================================"
+            )
+            print(
+                f"Fornecedor: {supplier_phone}"
+            )
+
+            if sent:
+
+                print(
+                    "Mensagem enviada com sucesso"
+                )
+
+            else:
+
+                print(
+                    "Falha ao enviar mensagem"
+                )
 
         print(
             "========================================\n"
