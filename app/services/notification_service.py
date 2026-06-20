@@ -7,11 +7,11 @@ from app.models.pedido import TipoPedido
 SUPPLIERS = {
     TipoPedido.GAS: {
         "name": "Del",
-        "phone": "558396241663",
+        "phone": "5517981471335",
     },
     TipoPedido.AGUA: {
         "name": "Jaelson",
-        "phone": "558396241663",
+        "phone": "5517981471335",
     },
 }
 

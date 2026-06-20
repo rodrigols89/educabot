@@ -1,8 +1,4 @@
-"""
-Main entrypoint for FastAPI application.
-
-Initializes the API server and routes.
-"""
+# app/main.py
 
 from fastapi import FastAPI
 

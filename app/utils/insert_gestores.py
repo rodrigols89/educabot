@@ -1,11 +1,4 @@
-"""
-Initial manager data loader.
-
-Responsible for inserting default managers into the database.
-
-From Root dir run the command below:
-python -m app.utils.insert_gestores
-"""
+# app/utils/insert_gestores.py
 
 from sqlalchemy.orm import Session
 
