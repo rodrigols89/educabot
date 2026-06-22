@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 
+
 #################### ( Dependencies ) ####################
 
 requires-python = ">=3.12,<=3.14"
@@ -16,4 +17,49 @@ dependencies = [
     "requests>=2.34.2",
     "sqlalchemy>=2.0.50",
     "uvicorn>=0.48.0",
+]
+
+
+################### ( Ruff Settings ) ####################
+
+[tool.ruff]
+line-length = 79
+exclude = [
+    ".venv",
+    "alembic/versions",
+    "migrations",
+    "__pycache__",
+    "**/driver.py",
+    "app/utils/insert_gestores.py",
+]
+
+[tool.ruff.lint]
+preview = true
+select = ["I", "F", "E", "W", "PL", "PT"]
+
+[tool.ruff.format]
+preview = true
+quote-style = "double"
+
+
+################## ( Testing Settings ) ##################
+
+[tool.pytest.ini_options]
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+# Filter out annoying notifications, but don't hide everything.
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+# Extra options to ensure a clean exit.
+addopts = [
+    "--disable-warnings",
+    "--maxfail=1"
+]
+
+[tool.coverage.run]
+omit = [
+    "*/__init__.py",
 ]

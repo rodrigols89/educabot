@@ -1,0 +1,36 @@
+repos:
+  - repo: local
+    hooks:
+
+      # --------------------------------------------------------
+      #  LINT (somente quando arquivos Python mudarem)
+      # --------------------------------------------------------
+      - id: ruff-lint
+        name: Check Lint (Ruff)
+        entry: make lint
+        language: system
+        types: [python]
+        pass_filenames: false
+        exclude: ^(alembic/versions/|app/utils/insert_gestores\.py$)
+
+      # --------------------------------------------------------
+      #  TESTE (somente quando arquivos Python mudarem)
+      # --------------------------------------------------------
+      #- id: pytest-test
+      #  name: Check Test (Pytest)
+      #  entry: make test
+      #  language: system
+      #  types: [python]
+      #  pass_filenames: false
+      #  exclude: ^(alembic/versions/|app/utils/insert_gestores\.py$)
+
+      # --------------------------------------------------------
+      #  COVERAGE MINIMUM (Failure if < 70%)
+      # --------------------------------------------------------
+      #- id: pytest-coverage
+      #  name: Coverage Threshold
+      #  entry: pytest --cov=. --cov-fail-under=70
+      #  language: system
+      #  types: [python]
+      #  pass_filenames: false
+      #  exclude: ^(alembic/versions/|app/utils/insert_gestores\.py$)
