@@ -284,3 +284,6 @@ nohup.out
 
 # Ignore Certbot logs and work files
 certbot
+
+# Personal script
+app/utils/insert_responsavel.py
