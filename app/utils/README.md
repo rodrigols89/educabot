@@ -42,7 +42,7 @@ Por, exemplo:
 
 ## `evolution_parser.py`
 
-> O arquivo `evolution_parser.py` vai ser responsável por aplicar parsers nos dados que vem da *Evolution API*.
+> O arquivo `evolution_parser.py` vai ser responsável por aplicar parser nos dados que vem da *Evolution API*.
 
 [evolution_parser.py](evolution_parser.py)
 ```python
@@ -50,10 +50,15 @@ Por, exemplo:
 
 from typing import Any
 
+from app.utils.logger import print_separator
+
 
 def parse_evolution_message(
     payload: dict[str, Any],
 ) -> tuple[str | None, str | None]:
+
+    print_separator()
+    print("EVOLUTION PARSER PROCESS:")
 
     data: dict[str, Any] = payload.get(
         "data",
@@ -81,14 +86,20 @@ def parse_evolution_message(
     )
 
     if from_me:
-        print("\n========================================")
-        print("EVOLUTION PARSER PROCESS")
-        print("========================================")
-        print("fromMe (True)")
-        print(f"Text: {text}")
-        print("========================================\n")
 
-        return None, None
+        phone: str = payload.get(
+            "sender",
+            "",
+        ).replace(
+            "@s.whatsapp.net",
+            "",
+        )
+
+        print("fromMe (True)")
+        print(f"Phone: {phone}")
+        print(f"Text: {text}")
+
+        return phone, text
 
     phone: str = key.get(
         "senderPn",
@@ -98,13 +109,9 @@ def parse_evolution_message(
         "",
     )
 
-    print("\n========================================")
-    print("EVOLUTION PARSER PROCESS")
-    print("========================================")
     print("fromMe (False)")
     print(f"Phone: {phone}")
     print(f"Text: {text}")
-    print("========================================")
 
     return phone, text
 ```
@@ -117,69 +124,148 @@ def parse_evolution_message(
 
 > Aqui, nós vamos entender como essa função é (pode ser) utilizada.
 
-Bem, para essa versão do Evolution Go que nós estamos trabalhando quando alguém envia nós recebemos um JSON parecido com esse:
+Bem, para essa versão do **Evolution API** nós vamos ter 2 cenários de respostas do WebHook:
+
+### `JSON 1 — Mensagem enviada por você (fromMe: true)`
 
 ```json
 {
   "event": "messages.upsert",
   "instance": "educabot",
+
   "data": {
     "key": {
       "remoteJid": "168582063366331@lid",
-      "fromMe": false,
-      "id": "3EB06F9FD670807D6E4597",
-      "senderPn": "558396241663@s.whatsapp.net"
+      "fromMe": true,
+      "id": "3EB0374EA39183B55FAA7F"
     },
-    "pushName": "Deus, meu refugio",
-    "status": "DELIVERY_ACK",
+
+    "pushName": "Rodrigo Leite 😎",
+    "status": "SERVER_ACK",
+
     "message": {
-      "messageContextInfo": {
-        "deviceListMetadata": {
-          "senderKeyHash": "0I4ZvIC7QjWF6A==",
-          "senderTimestamp": "1781564354",
-          "senderAccountType": "E2EE",
-          "receiverAccountType": "E2EE",
-          "recipientKeyHash": "qOe97S5e60w6cw==",
-          "recipientTimestamp": "1782250066"
-        },
-        "deviceListMetadataVersion": 2,
-        "messageSecret": "YqfQ1oIM0hyCCfrcGxUAZoiIvrBY1ePUR34R+3g+8BU=",
-        "limitSharingV2": {
-          "trigger": "UNKNOWN",
-          "initiatedByMe": false
-        }
-      },
-      "conversation": "Boa noite."
+      "conversation": "oi"
     },
+
     "contextInfo": {
       "ephemeralSettingTimestamp": "1779497722",
+
       "disappearingMode": {
         "initiator": "CHANGED_IN_CHAT",
         "trigger": "CHAT_SETTING",
-        "initiatedByMe": true
+        "initiatedByMe": false
       }
     },
+
     "messageType": "conversation",
-    "messageTimestamp": 1782254348,
+    "messageTimestamp": 1782401376,
+
     "instanceId": "51349292-4f0f-4324-b5cb-662ae76d385a",
     "source": "web"
   },
+
   "destination": "http://172.17.0.1:8000/webhook/evolution",
-  "date_time": "2026-06-23T19:39:08.809Z",
-  "sender": "558393885557@s.whatsapp.net",
+  "date_time": "2026-06-25T12:29:37.253Z",
+
+  "sender": "558397777777@s.whatsapp.net",
+
   "server_url": "http://localhost:8080",
+
   "apikey": "8kL29xPq7mN4vZsT1yRwC5"
 }
 
 INFO:     172.18.0.4:56594 - "POST /webhook/evolution HTTP/1.1" 200 OK
 ```
 
- - `data -> key -> "fromMe"`
-   - Indica se foi você (True) ou não (False) quem enviou a mensagem.
- - `data -> key -> "senderPn"`
-   - Esse campo só aparece quando você recebe uma mensage, pois é o número de telefone de quem enviou a mensage.
+### `JSON 2 — Mensagem recebida (fromMe: false)`
 
-Sabendo disso, nós vamos manipular esse JSON a nosso favor:
+```json
+{
+  "event": "messages.upsert",
+  "instance": "educabot",
+
+  "data": {
+    "key": {
+      "remoteJid": "168582063366331@lid",
+      "fromMe": false,
+      "id": "3EB0A3734AAE662297E335",
+
+      "senderPn": "558397777777@s.whatsapp.net"
+    },
+
+    "pushName": "Deus, meu refugio",
+
+    "status": "DELIVERY_ACK",
+
+    "message": {
+      "messageContextInfo": {
+        "deviceListMetadata": {
+          "senderKeyHash": "0I4ZvIC7QjWF6A==",
+          "senderTimestamp": "1781564354",
+          "senderAccountType": "E2EE",
+
+          "receiverAccountType": "E2EE",
+
+          "recipientKeyHash": "qOe97S5e60w6cw==",
+          "recipientTimestamp": "1782250066"
+        },
+
+        "deviceListMetadataVersion": 2,
+
+        "messageSecret": "nAYoPI2Wsk8Ojwk9MnZRnKiwopKIRiGW1GATyhJA1/8=",
+
+        "limitSharingV2": {
+          "trigger": "UNKNOWN",
+          "initiatedByMe": false
+        }
+      },
+
+      "conversation": "oi"
+    },
+
+    "contextInfo": {
+      "ephemeralSettingTimestamp": "1779497722",
+
+      "disappearingMode": {
+        "initiator": "CHANGED_IN_CHAT",
+        "trigger": "CHAT_SETTING",
+        "initiatedByMe": true
+      }
+    },
+
+    "messageType": "conversation",
+
+    "messageTimestamp": 1782401400,
+
+    "instanceId": "51349292-4f0f-4324-b5cb-662ae76d385a",
+
+    "source": "web"
+  },
+
+  "destination": "http://172.17.0.1:8000/webhook/evolution",
+
+  "date_time": "2026-06-25T12:30:00.790Z",
+
+  "sender": "558397777777@s.whatsapp.net",
+
+  "server_url": "http://localhost:8080",
+
+  "apikey": "8kL29xPq7mN4vZsT1yRwC5"
+}
+
+INFO:     172.18.0.4:56594 - "POST /webhook/evolution HTTP/1.1" 200 OK
+```
+
+Sabendo disso, nós vamos pegar os seguintes campos nos seguintes casos:
+
+ - `JSON 1 — Mensagem enviada por você (fromMe: true)`
+   - `"sender"` que vai ser o nosso número de telefone: `"558397777777@s.whatsapp.net"`
+   - `"conversation"` que vai ser a mensagem que nós enviamos: `"oi"`
+ - `JSON 2 — Mensagem recebida (fromMe: false)`
+   - `"senderPn"` que vai ser o número de telefone de quem enviou a mensagem: `"558397777777@s.whatsapp.net"`
+   - `"conversation"` que vai ser a mensagem que nós recebemos: `"oi"`
+
+Sabendo disso, nós vamos manipular esses possíveis JSON a nosso favor:
 
 ```python
 data: dict[str, Any] = payload.get(
