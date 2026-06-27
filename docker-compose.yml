@@ -3,6 +3,8 @@ services:
     image: postgres:15
     container_name: educabot_postgres
     restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -13,36 +15,36 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - 5433:5432 # host:container
     expose:
       - 5432
+
   redis:
     image: redis:latest
     container_name: educabot_redis
     restart: always
+    env_file:
+      - .env
     networks:
       - educabot-net
     command: >
       redis-server --port 6379 --appendonly yes
-    env_file:
-      - .env
     volumes:
       - redis_data:/data
-    ports:
-      - 6380:6379 # host:container
+    expose:
+      - 6379
+
   evolution-api:
     image: evoapicloud/evolution-api:v2.3.0
     container_name: educabot_evolution
     restart: always
-    networks:
-      - educabot-net
     env_file:
       - .env
+    networks:
+      - educabot-net
     volumes:
       - evolution_data:/evolution/instances
     ports:
-      - 8080:8080 # host:container
+      - "8080:8080"
     depends_on:
       - postgres
       - redis

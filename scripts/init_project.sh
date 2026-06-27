@@ -2,11 +2,8 @@
 set -e
 
 # ============================================================================
-# Função para exibir separadores visuais no terminal
-#
-# Utilizada para melhorar a leitura da saída do script.
+# Função de separador visual
 # ============================================================================
-
 print_separator() {
     echo ""
     echo "============================================================================================"
@@ -15,78 +12,41 @@ print_separator() {
 
 
 
+
+
 # ============================================================================
 # Diretório raiz do projeto
-#
-# Descobre automaticamente o diretório principal do projeto,
-# independentemente de onde o script for executado.
-#
-# Exemplo:
-# /home/user/educabot
 # ============================================================================
-
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 
 
-# ============================================================================
-# Caminho do ambiente virtual
-#
-# Define onde o ambiente virtual Python deve existir.
-#
-# Exemplo:
-# /home/user/educabot/.venv
-# ============================================================================
 
+
+# ============================================================================
+# Ambiente virtual
+# ============================================================================
 VENV_DIR="$PROJECT_ROOT/.venv"
-
-
-
-# ============================================================================
-# Executáveis do ambiente virtual
-#
-# Cria atalhos para utilizar o Python e o Pip do ambiente virtual,
-# garantindo que todos os comandos sejam executados isoladamente
-# do sistema operacional.
-# ============================================================================
-
 VENV_PYTHON="$VENV_DIR/bin/python"
 VENV_PIP="$VENV_DIR/bin/pip"
 VENV_ALEMBIC="$VENV_DIR/bin/alembic"
-
-
-
-# ============================================================================
-# Navegação para a raiz do projeto
-#
-# Garante que todos os comandos posteriores sejam executados a partir
-# do diretório principal da aplicação.
-# ============================================================================
 
 cd "$PROJECT_ROOT"
 
 
 
-# ============================================================================
-# Carregamento das variáveis de ambiente
-#
-# Se existir um arquivo .env na raiz do projeto, suas variáveis serão
-# carregadas para o ambiente atual do shell.
-#
-# Isso permite que DATABASE_URL, SECRET_KEY e outras configurações
-# estejam disponíveis para o Alembic e para a aplicação.
-# ============================================================================
 
+
+# ============================================================================
+# Carrega .env (IMPORTANTE para DATABASE_URL e configs)
+# ============================================================================
 if [ -f ".env" ]; then
     set -a
     source .env
     set +a
 fi
 
-
-
-echo "  🚀  Initializing the project..."
-
+echo "🚀 Initializing EducaBot..."
 print_separator
 
 
@@ -94,24 +54,12 @@ print_separator
 
 
 # ============================================================================
-# Atualização do sistema operacional
-#
-# Esta etapa atualiza a lista de pacotes disponíveis e instala as versões
-# mais recentes dos pacotes já instalados no servidor.
-#
-# Objetivo:
-# - Garantir correções de segurança.
-# - Atualizar dependências do sistema.
-# - Evitar problemas com pacotes desatualizados.
+# Atualização do sistema
 # ============================================================================
-
-echo "  📦  Updating system packages..."
-
+echo "📦 Updating system packages..."
 sudo apt-get update
 sudo apt-get upgrade -y
-
-echo "  ✅  System packages updated."
-
+echo "✅ System updated"
 print_separator
 
 
@@ -119,37 +67,23 @@ print_separator
 
 
 # ============================================================================
-# Verificação das dependências do Python
-#
-# Confirma que Python, Pip e o módulo de ambientes virtuais estão
-# instalados no sistema.
-#
-# Caso algum deles não exista, o script realiza a instalação
-# automaticamente.
+# Python dependencies
 # ============================================================================
-
-echo "  🐍  Checking Python dependencies (Python3 + pip)..."
+echo "🐍 Checking Python dependencies..."
 
 if ! command -v python3 >/dev/null 2>&1; then
-    echo "  📦  Installing python3..."
     sudo apt-get install -y python3
-    echo "  ✅  Python3 installed."
 fi
 
 if ! command -v pip3 >/dev/null 2>&1; then
-    echo "  📦  Installing python3-pip..."
     sudo apt-get install -y python3-pip
-    echo "  ✅  Python3-pip installed."
 fi
 
 if ! dpkg -s python3-venv >/dev/null 2>&1; then
-    echo "  📦  Installing python3-venv..."
     sudo apt-get install -y python3-venv
-    echo "  ✅  Python3-venv installed."
 fi
 
-echo "  ✅  Python dependencies (Python3 + pip) ready."
-
+echo "✅ Python ready"
 print_separator
 
 
@@ -157,30 +91,15 @@ print_separator
 
 
 # ============================================================================
-# Criação ou reutilização do ambiente virtual
-#
-# Verifica se o ambiente virtual já existe.
-#
-# Caso não exista:
-# - cria um novo ambiente virtual Python.
-#
-# Caso exista:
-# - reutiliza o ambiente já criado.
-#
-# O ambiente virtual permite instalar dependências do projeto sem
-# afetar o Python global do sistema operacional.
+# Virtualenv
 # ============================================================================
-
-echo "  🐍  Checking virtual environment..."
+echo "🐍 Checking virtual environment..."
 
 if [ ! -d "$VENV_DIR" ]; then
-    echo "  📦  Virtual environment not found. Creating..."
-
     python3 -m venv "$VENV_DIR"
-
-    echo "  ✅  Virtual environment created."
+    echo "✅ Virtualenv created"
 else
-    echo "  ✅  Virtual environment already exists."
+    echo "✅ Virtualenv already exists"
 fi
 
 print_separator
@@ -190,44 +109,14 @@ print_separator
 
 
 # ============================================================================
-# Garantia de funcionamento do Pip
-#
-# Algumas distribuições Linux criam ambientes virtuais sem instalar
-# automaticamente o Pip.
-#
-# O comando ensurepip garante que o gerenciador de pacotes esteja
-# disponível dentro do ambiente virtual.
+# Pip setup
 # ============================================================================
-
-echo "  🛠️  Ensuring pip exists inside virtual environment..."
+echo "🛠️ Ensuring pip..."
 
 "$VENV_PYTHON" -m ensurepip --upgrade
-
-echo "  ✅  Pip available inside virtual environment."
-
-print_separator
-
-
-
-
-
-# ============================================================================
-# Atualização do Pip
-#
-# Instala a versão mais recente do gerenciador de pacotes Python.
-#
-# Benefícios:
-# - Melhor compatibilidade.
-# - Correções de bugs.
-# - Melhor suporte a dependências modernas.
-# ============================================================================
-
-echo "  ⬆️  Upgrading pip..."
-
 "$VENV_PYTHON" -m pip install --upgrade pip
 
-echo "  ✅  Pip upgraded."
-
+echo "✅ pip ready"
 print_separator
 
 
@@ -235,27 +124,14 @@ print_separator
 
 
 # ============================================================================
-# Instalação das dependências do projeto
-#
-# Caso exista um arquivo requirements.txt, todas as dependências
-# necessárias para a aplicação serão instaladas ou atualizadas.
-#
-# Exemplos:
-# - FastAPI
-# - SQLAlchemy
-# - Alembic
-# - Pytest
-# - Uvicorn
+# Dependencies
 # ============================================================================
-
 if [ -f "requirements.txt" ]; then
-    echo "  📥  Installing dependencies..."
-
-    "$VENV_PIP" install -U -v -r requirements.txt
-
-    echo "  ✅  Dependencies installed."
+    echo "📥 Installing dependencies..."
+    "$VENV_PIP" install -U -r requirements.txt
+    echo "✅ dependencies installed"
 else
-    echo "  ⚠️  requirements.txt not found. Skipping dependency installation."
+    echo "⚠️ requirements.txt not found"
 fi
 
 print_separator
@@ -265,30 +141,13 @@ print_separator
 
 
 # ============================================================================
-# Inicialização dos containers Docker
-#
-# Inicia todos os serviços definidos no docker-compose.yml
-# em modo background.
-#
-# Serviços esperados:
-# - PostgreSQL
-# - Redis (caso utilizado)
-# - Evolution API
-#
-# O parâmetro -d faz com que os containers sejam executados
-# em segundo plano sem bloquear a execução do script.
-#
-# Equivalente a:
-#
-# docker compose up -d
+# Docker startup
 # ============================================================================
-
-echo "  🐳  Starting Docker containers..."
+echo "🐳 Starting Docker containers..."
 
 docker compose up -d
 
-echo "  ✅  Containers started."
-
+echo "✅ Containers started"
 print_separator
 
 
@@ -296,23 +155,19 @@ print_separator
 
 
 # ============================================================================
-# Aguarda PostgreSQL ficar disponível
-#
-# Após subir os containers, o banco pode levar alguns segundos para
-# aceitar conexões.
-#
-# O loop abaixo somente continua quando o PostgreSQL estiver pronto.
+# Waiting PostgreSQL (CRÍTICO)
 # ============================================================================
+echo "⏳ Waiting PostgreSQL..."
 
-echo "  ⏳  Waiting for PostgreSQL..."
-
-until docker compose exec -T postgres pg_isready -U "$POSTGRES_USER" >/dev/null 2>&1
+until docker compose exec -T postgres pg_isready -U postgres -d postgres >/dev/null 2>&1
 do
     sleep 1
 done
 
-echo "  ✅  PostgreSQL is ready."
+# garante execução do init.sql
+sleep 3
 
+echo "✅ PostgreSQL ready"
 print_separator
 
 
@@ -320,48 +175,15 @@ print_separator
 
 
 # ============================================================================
-# Execução das migrations do banco de dados
-#
-# Aplica todas as migrations pendentes utilizando o Alembic.
-#
-# Objetivo:
-# - Criar tabelas.
-# - Atualizar estruturas existentes.
-# - Garantir que o banco esteja compatível com a versão atual
-#   da aplicação.
-#
-# Equivalente a:
-#
-# alembic upgrade head
+# Migrations
 # ============================================================================
+echo "🔄 Running migrations..."
 
-echo "  🔄  Running migrations..."
+export DATABASE_URL="$DATABASE_URL"
 
 "$VENV_ALEMBIC" upgrade head
 
-echo "  ✅  Migrations complete."
-
-print_separator
-
-
-
-
-
-# ============================================================================
-# Inserção dos gestores padrão
-#
-# Popula a tabela gestores com os registros iniciais do sistema.
-#
-# Caso um gestor já exista, o script deve ignorá-lo para evitar
-# duplicidades.
-# ============================================================================
-
-echo "  👥  Inserting managers..."
-
-"$VENV_PYTHON" -m app.utils.insert_gestores
-
-echo "  ✅  Managers inserted."
-
+echo "✅ Migrations completed"
 print_separator
 
 
@@ -370,17 +192,10 @@ print_separator
 
 # ============================================================================
 # Finalização
-#
-# Exibe uma mensagem indicando que toda a preparação do ambiente
-# foi concluída com sucesso.
-#
-# Após esta etapa a aplicação já está pronta para ser executada.
 # ============================================================================
-
 echo ""
-echo "  🎉  Project initialization complete!"
+echo "🎉 EducaBot initialized successfully!"
 echo ""
-echo "  You can now run:"
-echo ""
-echo "  make server"
+echo "👉 Run server:"
+echo "   make server"
 echo ""
