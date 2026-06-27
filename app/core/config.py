@@ -1,95 +1,67 @@
 # app/core/config.py
 
 """
-Module Purpose:
-    Provide centralized application configuration management by loading
-    environment variables and exposing them through a shared settings object.
+Resumo do módulo:
+Centraliza o carregamento e a disponibilização das configurações
+da aplicação.
 
-Extended Description:
-    This module is responsible for reading configuration values from the
-    operating system environment and optional .env files. It initializes
-    environment loading during module import and maps configuration values
-    to a dedicated settings container.
+Descrição estendida:
+Este módulo carrega as variáveis de ambiente utilizando
+python-dotenv e disponibiliza uma instância única da classe
+Settings para acesso às configurações da aplicação.
 
-    The resulting settings instance acts as a single source of truth for
-    application configuration, allowing other modules to access database,
-    cache, authentication, and external service settings in a consistent
-    manner.
+As configurações abrangem conexão com banco de dados, Redis,
+Evolution API, fornecedores e demais parâmetros utilizados
+pelos serviços da aplicação.
 
-Main Responsibilities:
-    - Load environment variables from a .env file.
-    - Define application configuration attributes.
-    - Provide default values for selected settings.
-    - Expose a globally accessible settings instance.
-    - Centralize configuration retrieval logic.
+Responsabilidades principais:
+- Carregar variáveis de ambiente
+- Centralizar configurações da aplicação
+- Disponibilizar uma instância compartilhada de Settings
+- Converter variáveis para tipos apropriados quando necessário
 
-Key Components:
-    Settings:
-        Configuration container that stores application settings loaded
-        from environment variables.
+Componentes principais:
+- Settings
+- settings
 
-    settings:
-        Singleton-style instance of the Settings class used throughout
-        the application.
+Dependências:
+- os
+- dotenv.load_dotenv
 
-Dependencies:
-    - os:
-        Used to retrieve environment variable values.
-    - dotenv.load_dotenv:
-        Loads variables from a .env file into the process environment.
+Efeitos colaterais:
+- Carrega variáveis do arquivo .env durante a importação do
+  módulo
 
-Side Effects:
-    - Loads environment variables from a .env file during module import.
-    - Initializes configuration values immediately when the module is loaded.
-    - Creates a global settings instance.
+Entrada/Saída:
+- Entrada: variáveis de ambiente do sistema e do arquivo .env
+- Saída: configuração centralizada da aplicação
 
-Input/Output Behavior:
-    Inputs:
-        - Environment variables available in the runtime environment.
-        - Values defined in a .env file.
+Estratégia de tratamento de erros:
+- Utiliza valores padrão quando uma variável não está definida
+- Não realiza validações de consistência das configurações
 
-    Outputs:
-        - A populated Settings object containing configuration values
-          represented as strings.
+Considerações de performance:
+- As configurações são carregadas apenas durante a importação
+  do módulo
+- O acesso aos atributos ocorre em memória
 
-Error Handling Strategy:
-    - Missing environment variables do not raise exceptions.
-    - Empty strings are used as fallback values for most configuration
-      entries.
-    - A predefined default URL is provided for the external API endpoint
-      when no environment variable is supplied.
+Notas de concorrência:
+- A instância compartilhada é utilizada apenas para leitura
+- Seguro para uso concorrente desde que as configurações não
+  sejam modificadas em tempo de execução
 
-Performance Considerations:
-    - Configuration values are resolved once during module import.
-    - Environment lookups have negligible runtime overhead.
-    - Subsequent access to configuration values is performed through
-      in-memory attributes.
+Exemplo de uso:
+api_url = settings.EVOLUTION_API_URL
 
-Thread Safety / Concurrency Notes:
-    - The module exposes immutable configuration values after initialization.
-    - Safe for concurrent read access in multithreaded environments.
-    - No synchronization mechanisms are required because configuration
-      values are not modified dynamically.
+database = settings.DATABASE_URL
 
-Usage Example:
-    from app.core.config import settings
+Limitações:
+- Não valida formatos de URLs ou telefones
+- Não verifica ausência de configurações obrigatórias
 
-    database_uri = settings.DATABASE_CONNECTION_URI
-    redis_uri = settings.CACHE_REDIS_URI
-
-Limitations:
-    - All configuration values are stored as strings without validation.
-    - No type conversion or schema enforcement is performed.
-    - Configuration changes made after module import are not automatically
-      reflected in the existing settings instance.
-    - Missing required values are not detected automatically.
-
-Version / Maintenance Notes:
-    - New configuration parameters should be added to the Settings class
-      to preserve centralized configuration management.
-    - Consider introducing validation and typed settings if application
-      complexity increases.
-    - The module should remain lightweight to avoid import-time overhead.
+Versão/manutenção:
+- Novas configurações devem ser adicionadas à classe Settings
+- Alterações exigem atualização do arquivo .env
 """
 
 import os
@@ -101,41 +73,85 @@ load_dotenv()
 
 class Settings:
     """
-    Centralizes application settings loaded from environment variables.
+    Resumo da classe:
+    Armazena as configurações globais da aplicação.
 
-    This class provides a single access point for configuration values
-    related to database connections, authentication, Redis cache, and
-    external service integrations. All settings are loaded during class
-    initialization and exposed as class attributes.
+    Propósito:
+    Centralizar o acesso às variáveis de ambiente utilizadas
+    pelos diferentes componentes do sistema.
 
-    Attributes:
+    Atributos:
         DATABASE_URL (str):
-            Primary database connection URL.
+            URL de conexão com o banco de dados.
 
         CONFIG_SESSION_PHONE_VERSION (str):
-            Configuration version used for phone session management.
+            Configuração da versão da sessão telefônica.
 
         AUTHENTICATION_API_KEY (str):
-            API key used to authenticate requests to protected services.
+            Chave utilizada para autenticação na Evolution API.
 
         DATABASE_PROVIDER (str):
-            Name of the database provider used by the application.
+            Provedor do banco de dados.
 
         DATABASE_CONNECTION_URI (str):
-            Complete database connection URI.
+            URI de conexão com o banco de dados.
 
         CACHE_REDIS_URI (str):
-            Redis server connection URI.
+            URI de conexão com o Redis.
 
         CACHE_REDIS_PREFIX_KEY (str):
-            Prefix applied to Redis keys for namespacing and isolation.
+            Prefixo utilizado nas chaves do Redis.
 
         EVOLUTION_API_URL (str):
-            Base URL of the Evolution API.
-            Defaults to "http://localhost:8080".
+            URL base da Evolution API.
 
         EVOLUTION_INSTANCE (str):
-            Identifier or name of the configured Evolution API instance.
+            Nome da instância da Evolution API.
+
+        SUPPLIER_GAS_NAME (str):
+            Nome do fornecedor de gás.
+
+        SUPPLIER_GAS_PHONE (str):
+            Telefone do fornecedor de gás.
+
+        SUPPLIER_WATER_NAME (str):
+            Nome do fornecedor de água.
+
+        SUPPLIER_WATER_PHONE (str):
+            Telefone do fornecedor de água.
+
+        SUPPLIER_SECRETARIAT_WATER_NAME (str):
+            Nome do fornecedor da secretaria.
+
+        SUPPLIER_SECRETARIAT_WATER_PHONE (str):
+            Telefone do fornecedor da secretaria.
+
+        SECRETARIAT_PHONES (list[str]):
+            Lista de telefones pertencentes à secretaria.
+
+    Visão geral dos métodos:
+        Não possui métodos próprios.
+        Atua como um objeto de configuração.
+
+    Observações:
+        Os valores são carregados durante a criação da
+        instância da classe.
+
+    Exemplo de uso:
+        api_url = settings.EVOLUTION_API_URL
+
+        redis_uri = settings.CACHE_REDIS_URI
+
+        if phone in settings.SECRETARIAT_PHONES:
+            processar()
+
+    Notas sobre concorrência:
+        A classe é utilizada apenas para leitura e pode ser
+        compartilhada entre múltiplas threads.
+
+    Considerações de design:
+        Centraliza todas as configurações da aplicação em um
+        único objeto, facilitando manutenção e reutilização.
     """
 
     DATABASE_URL: str = os.getenv(
@@ -182,6 +198,45 @@ class Settings:
         "EVOLUTION_INSTANCE",
         "",
     )
+
+    SUPPLIER_GAS_NAME: str = os.getenv(
+        "SUPPLIER_GAS_NAME",
+        "",
+    )
+
+    SUPPLIER_GAS_PHONE: str = os.getenv(
+        "SUPPLIER_GAS_PHONE",
+        "",
+    )
+
+    SUPPLIER_WATER_NAME: str = os.getenv(
+        "SUPPLIER_WATER_NAME",
+        "",
+    )
+
+    SUPPLIER_WATER_PHONE: str = os.getenv(
+        "SUPPLIER_WATER_PHONE",
+        "",
+    )
+
+    SUPPLIER_SECRETARIAT_WATER_NAME: str = os.getenv(
+        "SUPPLIER_SECRETARIAT_WATER_NAME",
+        "",
+    )
+
+    SUPPLIER_SECRETARIAT_WATER_PHONE: str = os.getenv(
+        "SUPPLIER_SECRETARIAT_WATER_PHONE",
+        "",
+    )
+
+    SECRETARIAT_PHONES: list[str] = [
+        phone.strip()
+        for phone in os.getenv(
+            "SECRETARIAT_PHONES",
+            "",
+        ).split(",")
+        if phone.strip()
+    ]
 
 
 settings = Settings()

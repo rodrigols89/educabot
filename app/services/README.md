@@ -367,17 +367,18 @@ POST /message/sendText/educabot
 ```python
 # app/services/notification_service.py
 
+from app.core.config import settings
 from app.models.pedido import TipoPedido
 from app.models.responsavel import Responsavel
 
 SUPPLIERS = {
     TipoPedido.GAS: {
-        "name": "Del",
-        "phone": "5517981471335",
+        "name": settings.SUPPLIER_GAS_NAME,
+        "phone": settings.SUPPLIER_GAS_PHONE,
     },
     TipoPedido.AGUA: {
-        "name": "Jaelson",
-        "phone": "5517981471335",
+        "name": settings.SUPPLIER_WATER_NAME,
+        "phone": settings.SUPPLIER_WATER_PHONE,
     },
 }
 
@@ -391,22 +392,43 @@ def build_supplier_message(
 
     supplier = SUPPLIERS[tipo]
 
+    is_secretariat_water = (
+        tipo == TipoPedido.AGUA
+        and responsavel.telefone
+        in settings.SECRETARIAT_PHONES
+    )
+
+    if is_secretariat_water:
+        supplier = {
+            "name": (
+                settings.SUPPLIER_SECRETARIAT_WATER_NAME
+            ),
+            "phone": (
+                settings.SUPPLIER_SECRETARIAT_WATER_PHONE
+            ),
+        }
+
     if tipo == TipoPedido.GAS:
-        item = "gás"
+        quantidade = "1"
+        item = "botijão de gás"
+
+    elif is_secretariat_water:
+        quantidade = "2"
+        item = "galões de água"
+
     else:
-        item = "pipa"
+        quantidade = "1"
+        item = "pipa d'água"
 
     message = (
         f"Bom dia!\n"
-        f"1 {item} para "
-        f"{responsavel.instituicao}, "
-        f"responsável {responsavel.nome}, "
-        f"telefone para contato "
-        f"{responsavel.telefone}."
+        f"{quantidade} {item} para a {responsavel.instituicao}, por favor.\n"
+        f"Responsável pelo pedido: {responsavel.nome}.\n"
+        f"Telefone para contato: {responsavel.telefone}."
     )
 
     print(
-        f"Pedido de {item} será enviado para "
+        f"Pedido de {quantidade} {item} será enviado para "
         f"{supplier['name']} ({supplier['phone']})"
     )
 

@@ -117,6 +117,45 @@ class Settings:
         "",
     )
 
+    SUPPLIER_GAS_NAME: str = os.getenv(
+        "SUPPLIER_GAS_NAME",
+        "",
+    )
+
+    SUPPLIER_GAS_PHONE: str = os.getenv(
+        "SUPPLIER_GAS_PHONE",
+        "",
+    )
+
+    SUPPLIER_WATER_NAME: str = os.getenv(
+        "SUPPLIER_WATER_NAME",
+        "",
+    )
+
+    SUPPLIER_WATER_PHONE: str = os.getenv(
+        "SUPPLIER_WATER_PHONE",
+        "",
+    )
+
+    SUPPLIER_SECRETARIAT_WATER_NAME: str = os.getenv(
+        "SUPPLIER_SECRETARIAT_WATER_NAME",
+        "",
+    )
+
+    SUPPLIER_SECRETARIAT_WATER_PHONE: str = os.getenv(
+        "SUPPLIER_SECRETARIAT_WATER_PHONE",
+        "",
+    )
+
+    SECRETARIAT_PHONES: list[str] = [
+        phone.strip()
+        for phone in os.getenv(
+            "SECRETARIAT_PHONES",
+            "",
+        ).split(",")
+        if phone.strip()
+    ]
+
 
 settings = Settings()
 ```

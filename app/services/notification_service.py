@@ -2,53 +2,54 @@
 
 """
 Resumo do módulo:
-Fornece funcionalidades para geração de mensagens destinadas
-a fornecedores.
+Fornece serviços para seleção de fornecedores e geração de
+mensagens de solicitação.
 
 Descrição estendida:
-Este módulo centraliza a configuração dos fornecedores
-responsáveis pelo atendimento de pedidos e a construção das
-mensagens enviadas a eles.
+Este módulo é responsável por selecionar o fornecedor adequado
+com base no tipo do pedido e, quando necessário, em regras de
+negócio específicas do responsável.
 
-A partir do tipo de pedido e dos dados do responsável, o
-módulo gera uma mensagem formatada contendo as informações
-necessárias para atendimento da solicitação.
+Após definir o fornecedor, o módulo gera uma mensagem
+padronizada contendo as informações necessárias para o
+atendimento da solicitação.
 
 Responsabilidades principais:
-- Manter o mapeamento de fornecedores por tipo de pedido
-- Gerar mensagens para fornecedores
-- Definir destinatários para notificações
-- Padronizar o conteúdo das solicitações
+- Definir fornecedores por tipo de pedido
+- Aplicar regras para seleção de fornecedores
+- Gerar mensagens padronizadas
+- Definir destinatário das notificações
+- Registrar informações de depuração
 
 Componentes principais:
 - SUPPLIERS
 - build_supplier_message
 
 Dependências:
+- app.core.config.settings
 - app.models.pedido.TipoPedido
 - app.models.responsavel.Responsavel
 
 Efeitos colaterais:
-- Nenhum efeito colateral externo
-- Apenas gera dados em memória
+- Escreve informações de depuração na saída padrão
 
 Entrada/Saída:
-- Entrada: responsável e tipo de pedido
+- Entrada: responsável e tipo do pedido
 - Saída: telefone do fornecedor e mensagem formatada
 
 Estratégia de tratamento de erros:
 - Não realiza tratamento explícito de exceções
-- Depende da existência do tipo de pedido no mapeamento de
-  fornecedores
+- Depende da existência das configurações carregadas em
+  settings
 
 Considerações de performance:
-- Operações simples de acesso a dicionários e formatação de
-  strings
-- Custo computacional desprezível
+- Executa apenas consultas em memória e formatação de strings
+- Não realiza acesso ao banco de dados ou serviços externos
 
 Notas de concorrência:
-- Não mantém estado mutável durante execução
+- O módulo não mantém estado mutável durante a execução
 - Seguro para uso concorrente
+- As configurações são compartilhadas apenas para leitura
 
 Exemplo de uso:
 phone, message = build_supplier_message(
@@ -57,26 +58,27 @@ phone, message = build_supplier_message(
 )
 
 Limitações:
-- Fornecedores são definidos estaticamente no código
-- Não suporta múltiplos fornecedores por categoria
-- Não possui integração direta com serviços de envio
+- Os fornecedores são definidos por configuração
+- Não realiza o envio das mensagens
+- Não valida telefones ou configurações
 
 Versão/manutenção:
-- Novos tipos de pedido exigem atualização do mapeamento
-  SUPPLIERS
+- Novos fornecedores ou regras de seleção devem ser
+  implementados neste módulo.
 """
 
+from app.core.config import settings
 from app.models.pedido import TipoPedido
 from app.models.responsavel import Responsavel
 
 SUPPLIERS = {
     TipoPedido.GAS: {
-        "name": "Del",
-        "phone": "5517981471335",
+        "name": settings.SUPPLIER_GAS_NAME,
+        "phone": settings.SUPPLIER_GAS_PHONE,
     },
     TipoPedido.AGUA: {
-        "name": "Jaelson",
-        "phone": "5517981471335",
+        "name": settings.SUPPLIER_WATER_NAME,
+        "phone": settings.SUPPLIER_WATER_PHONE,
     },
 }
 
@@ -86,15 +88,14 @@ def build_supplier_message(
     tipo: TipoPedido,
 ) -> tuple[str, str]:
     """
-    Gera a mensagem destinada ao fornecedor responsável pelo
-    atendimento do pedido.
+    Seleciona o fornecedor e gera a mensagem da solicitação.
 
     Args:
         responsavel (Responsavel):
-            Responsável que realizou a solicitação.
+            Responsável que realizou o pedido.
 
         tipo (TipoPedido):
-            Tipo do pedido que será encaminhado ao fornecedor.
+            Tipo do pedido solicitado.
 
     Returns:
         tuple[str, str]:
@@ -109,15 +110,17 @@ def build_supplier_message(
             configurado no mapeamento de fornecedores.
 
     Observações:
-        O conteúdo da mensagem varia conforme o tipo de pedido.
+        Pedidos de água realizados por responsáveis cujos
+        telefones estejam cadastrados em
+        SECRETARIAT_PHONES utilizam um fornecedor específico.
 
-        Para pedidos de gás, a mensagem solicita uma unidade de
-        gás.
-
-        Para pedidos de água, a mensagem solicita um pipa.
+        A quantidade e o item solicitado variam conforme o tipo
+        do pedido e as regras de negócio aplicadas.
 
     Efeitos colaterais:
-        Nenhum.
+        - Escreve informações de depuração na saída padrão.
+        - Registra o fornecedor selecionado.
+        - Exibe a mensagem gerada.
 
     Exemplos:
         phone, message = build_supplier_message(
@@ -134,35 +137,57 @@ def build_supplier_message(
         print(message)
 
     Avisos:
-        O fornecedor deve estar previamente cadastrado no
-        mapeamento SUPPLIERS.
+        A seleção do fornecedor depende das configurações
+        definidas em settings.
 
     Limitações:
-        Não realiza envio da mensagem.
+        Não envia mensagens.
         Não valida dados do responsável.
-        Utiliza fornecedores definidos estaticamente.
+        Não verifica se os fornecedores estão corretamente
+        configurados.
     """
 
     print("\nCHOOSE SUPPLIER/MESSAGE PROCESS:")
 
     supplier = SUPPLIERS[tipo]
 
+    is_secretariat_water = (
+        tipo == TipoPedido.AGUA
+        and responsavel.telefone
+        in settings.SECRETARIAT_PHONES
+    )
+
+    if is_secretariat_water:
+        supplier = {
+            "name": (
+                settings.SUPPLIER_SECRETARIAT_WATER_NAME
+            ),
+            "phone": (
+                settings.SUPPLIER_SECRETARIAT_WATER_PHONE
+            ),
+        }
+
     if tipo == TipoPedido.GAS:
-        item = "gás"
+        quantidade = "1"
+        item = "botijão de gás"
+
+    elif is_secretariat_water:
+        quantidade = "2"
+        item = "galões de água"
+
     else:
-        item = "pipa"
+        quantidade = "1"
+        item = "pipa d'água"
 
     message = (
         f"Bom dia!\n"
-        f"1 {item} para "
-        f"{responsavel.instituicao}, "
-        f"responsável pelo pedido {responsavel.nome}, "
-        f"telefone para contato "
-        f"{responsavel.telefone}."
+        f"{quantidade} {item} para a {responsavel.instituicao}, por favor.\n"
+        f"Responsável pelo pedido: {responsavel.nome}.\n"
+        f"Telefone para contato: {responsavel.telefone}."
     )
 
     print(
-        f"Pedido de {item} será enviado para "
+        f"Pedido de {quantidade} {item} será enviado para "
         f"{supplier['name']} ({supplier['phone']})"
     )
 
