@@ -6,11 +6,69 @@
 
 ## Conteúdo
 
+ - [`health.py`](#health-py)
+   - [`health_check()`](#health-check)
  - [`webhook.py`](#webhook-py)
 <!---
 [WHITESPACE RULES]
 - "20" Whitespace character.
 --->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+<div id="health-py"></div>
+
+## `health.py`
+
+> Este módulo disponibiliza um endpoint utilizado para verificar se a API está em funcionamento e apta a receber requisições.
+
+
+
+
+
+---
+
+<div id="health-check"></div>
+
+## `health_check()`
+
+Esse endpoint vai ser responsável por retorna: o estado de funcionamento da aplicação:
+
+[health.py](health.py)
+```python
+# app/api/health.py
+
+from fastapi import APIRouter
+
+router = APIRouter(
+    tags=["Healthcheck"],
+)
+
+
+@router.get("/health")
+def health_check():
+
+    return {"status": "ok"}
+```
 
 
 
