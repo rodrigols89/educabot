@@ -33,11 +33,6 @@
 
 ## 🎯 Introdução e Objetivos do Projeto
 
-<<<<<<< HEAD
-## 🎯 Introdução e Objetivos do Projeto
-
-=======
->>>>>>> 526c8d0 (docs(usage): document how to use the project)
 O **EducaBot** foi desenvolvido para solucionar um processo operacional recorrente na **Secretaria de Educação de Remígio-PB**, onde trabalho:
 
 > A **necessidade de automatizar as solicitações de gás de cozinha e abastecimento de água** realizadas pelas unidades escolares e pela Secretaria de Educação através do WhatsApp.
@@ -301,6 +296,59 @@ Insere gestores
 Projeto pronto
 ```
 
+### `Inserindo pessoas (números) autorizados a fazer pedidos`
+
+Agora, que você já aplicou todas as migrações e seu Banco de Dados está disponível é interessante você inserir as pessoas (números) que tem permissões de fazer pedidos:
+
+```bash
+source .venv/bin/activate
+```
+
+```bash
+python insert_responsavel.py
+```
+
+**NOTE:**  
+> No exemplo acima você vai criar uma cópia do [app/utils/insert_responsavel_example.py](app/utils/insert_responsavel_example.py) e adaptar para seus clientes. Depois e só executar ele na raiz do projeto (igual eu fiz acima).
+
+### `Configurando o Evolution API`
+
+> Agora, nós precisamos aplicar as primeiras configurações do Evolution API.
+
+Comece abrindo o link de acesso do seu serviço:
+
+ - [http://seu-ip:8080/manager](http://seu-ip:8080/manager)
+
+> **NOTE:**  
+> Aqui vai se solicitado que você coloque sua `API Key Global`.  
+> É a mesma que você definiu em `AUTHENTICATION_API_KEY` nas *variáveis de ambiente (.env)*.
+
+Agora é só você criar uma instância, com:
+
+ - **nome da sua instânica**
+ - **Canal**
+   - `Baileys`
+ - **Token**
+   - O mesmo que você definiu em `AUTHENTICATION_API_KEY` nas *variáveis de ambiente (.env)*
+ - **Número**
+   - Número de telefone que você vai utilizar
+
+Continuando, agora você vai clicar na engrenage:
+
+ - **Configurações**
+   - *Comportamento*
+     - Ativar -> `Ignorar Grupos`
+     - Ativar -> `Sincronizar Histórico Completo`
+ - **Eventos**
+   - *Webhook*
+     - Ativar -> `Ativar ou desativar o webhook (V)`
+     - Adicionar URL -> `http://seu-ip:8001/webhook/evolution`
+     - Events
+       - Ativar -> `MESSAGES_UPSERT`
+ - **Salvar!**
+
+Por fim, lembre-se de ler o *QR-Code* para vincular o serviço ao seu *WhatsApp*.
+
 ### `Configurando o systemd`
 
 Para configurar um serviço que rode o nosso projeto em background, vamos executar um script que vai fazer todo esse processo automaticamente:
@@ -309,14 +357,14 @@ Para configurar um serviço que rode o nosso projeto em background, vamos execut
 make init_service
 ```
 
- - `systemctl status rag.service`
+ - `systemctl status educabot.service`
    - Verificar status.
    - **NOTE:** Esse comando é útil para ver se o serviço iniciou corretamente.
- - `journalctl -u rag.service -f`
+ - `journalctl -u educabot.service -f`
    - Ver logs do serviço.
- - `systemctl stop rag.service`
+ - `systemctl stop educabot.service`
    - Parar o serviço.
- - `systemctl restart rag.service`
+ - `systemctl restart educabot.service`
    - Reiniciar o serviço.
 
 ---
