@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - 5432:5432
+      - 5433:5432 # host:container
     expose:
       - 5432
   redis:
@@ -30,7 +30,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - 6379:6379
+      - 6380:6379 # host:container
   evolution-api:
     image: evoapicloud/evolution-api:v2.3.0
     container_name: educabot_evolution
@@ -42,7 +42,7 @@ services:
     volumes:
       - evolution_data:/evolution/instances
     ports:
-      - "8080:8080"
+      - 8080:8080 # host:container
     depends_on:
       - postgres
       - redis
