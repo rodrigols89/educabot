@@ -95,7 +95,7 @@ down_compose:
 
 restart_compose:
 	cd $(ROOT)
-	docker restart $$(docker ps -q)
+	docker compose restart
 
 build_compose:
 	cd $(ROOT)
@@ -118,20 +118,35 @@ open_evolution:
 	docker exec -it educabot_evolution sh
 
 
+# ----------------------------- ( Container Logs ) --------------------------
+
+log_postgres:
+	cd $(ROOT)
+	docker logs -f educabot_postgres
+
+log_redis:
+	cd $(ROOT)
+	docker logs -f educabot_redis
+
+log_evolution:
+	cd $(ROOT)
+	docker logs -f educabot_evolution
+
+
 # ------------------------------- ( Servers ) -------------------------------
 
 server:
 	cd $(ROOT)
 	$(UVICORN) app.main:app \
 		--host 0.0.0.0 \
-		--port 8000 \
+		--port 8001 \
 		--reload &
 
 check_server:
-	ss -ltnp '( sport = :8000 )' || true
+	ss -ltnp '( sport = :8001 )' || true
 
 kill_server:
-	kill $$(lsof -t -i:8000) 2>/dev/null || true
+	kill $$(lsof -t -i:8001) 2>/dev/null || true
 	pkill -f "uvicorn app.main:app" 2>/dev/null || true
 
 
