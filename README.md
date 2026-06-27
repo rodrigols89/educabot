@@ -33,8 +33,11 @@
 
 ## 🎯 Introdução e Objetivos do Projeto
 
+<<<<<<< HEAD
 ## 🎯 Introdução e Objetivos do Projeto
 
+=======
+>>>>>>> 526c8d0 (docs(usage): document how to use the project)
 O **EducaBot** foi desenvolvido para solucionar um processo operacional recorrente na **Secretaria de Educação de Remígio-PB**, onde trabalho:
 
 > A **necessidade de automatizar as solicitações de gás de cozinha e abastecimento de água** realizadas pelas unidades escolares e pela Secretaria de Educação através do WhatsApp.
