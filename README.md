@@ -33,7 +33,61 @@
 
 ## 🎯 Introdução e Objetivos do Projeto
 
-> Em breve...
+## 🎯 Introdução e Objetivos do Projeto
+
+O **EducaBot** foi desenvolvido para solucionar um processo operacional recorrente na **Secretaria de Educação de Remígio-PB**, onde trabalho:
+
+> A **necessidade de automatizar as solicitações de gás de cozinha e abastecimento de água** realizadas pelas unidades escolares e pela Secretaria de Educação através do WhatsApp.
+
+Antes da implantação do sistema, os responsáveis pelas escolas precisavam entrar em contato manualmente com os fornecedores, gerando retrabalho, dificuldades de controle e ausência de um registro centralizado dos pedidos.
+
+Para resolver esse problema, o EducaBot utiliza a **Evolution API** como gateway de integração com o WhatsApp e uma API desenvolvida em **FastAPI**, responsável por validar solicitações, aplicar regras de negócio, registrar pedidos e encaminhá-los automaticamente ao fornecedor correto.
+
+O sistema transforma mensagens enviadas via WhatsApp em solicitações estruturadas, reduzindo o tempo gasto no processo e garantindo maior padronização, rastreabilidade e confiabilidade das requisições.
+
+### 🎯 Objetivos Técnicos
+
+* Automatizar solicitações de gás e água realizadas via WhatsApp.
+* Identificar automaticamente o responsável através do número de telefone.
+* Validar comandos enviados pelos usuários autorizados.
+* Aplicar regras de negócio antes do processamento dos pedidos.
+* Registrar todos os pedidos em banco de dados.
+* Evitar pedidos duplicados da mesma categoria no mesmo dia.
+* Encaminhar automaticamente cada solicitação ao fornecedor correspondente.
+* Permitir configuração do sistema através de variáveis de ambiente.
+
+### 🏗️ Arquitetura do Sistema
+
+A solução é dividida em **quatro camadas principais**:
+
+* **1. Recepção de Eventos (Webhook Layer):**
+
+  * Recebe eventos enviados pela Evolution API.
+  * Identifica mensagens recebidas via WhatsApp.
+  * Extrai telefone e conteúdo da mensagem.
+  * Ignora eventos que não representam comandos válidos.
+
+* **2. Processamento das Regras de Negócio (Business Layer):**
+
+  * Valida os comandos suportados.
+  * Localiza o responsável autorizado.
+  * Verifica permissões para realização dos pedidos.
+  * Impede pedidos duplicados da mesma categoria no mesmo dia.
+  * Seleciona automaticamente o fornecedor adequado para cada solicitação.
+
+* **3. Persistência dos Dados (Persistence Layer):**
+
+  * Consulta responsáveis cadastrados.
+  * Registra novos pedidos.
+  * Consulta pedidos realizados no dia.
+  * Mantém o histórico das solicitações em banco PostgreSQL.
+
+* **4. Integração Externa (Notification Layer):**
+
+  * Gera mensagens padronizadas para os fornecedores.
+  * Envia solicitações utilizando a Evolution API.
+  * Notifica o responsável sobre o resultado da solicitação.
+  * Centraliza toda a comunicação realizada pelo sistema via WhatsApp.
 
 
 
@@ -196,7 +250,7 @@ usermod -aG docker $USER
 
 ### `Clonando o repositório`
 
-Aqui, vamos começar clonando o repositório e baixando as dependências:
+Agora, vamos clonar o repositóri para a nossa VPS:
 
 ```bash
 git clone https://github.com/rodrigols89/educabot
@@ -208,54 +262,9 @@ cd educabot
 
 ### `Adicionando as variáveis de ambiente`
 
-Outro passo importante vai ser adicionar as variáveis de ambiente:
+> Outro passo importante vai ser adicionar (atualizar) as variáveis de ambiente.
 
-```bash
-nano .env
-```
-
-Adicione as variáveis de ambiente:
-
-**.env**
-```bash
-# ==========================
-# POSTGRESQL
-# ==========================
-POSTGRES_DB=
-POSTGRES_USER=
-POSTGRES_PASSWORD=
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-
-# ==========================
-# DATABASE URL (FastAPI)
-# ==========================
-# dialect+driver://username:password@host:port/database
-DATABASE_URL=
-
-# ==========================
-# EVOLUTION API
-# ==========================
-EVOLUTION_API_URL=http://localhost:8080
-EVOLUTION_INSTANCE=
-EVOLUTION_API_KEY=
-```
-
-Aperte `CTRL + x`, `y` e depois `ENTER` para salvar.
-
-```bash
-nano .env.evolution
-```
-
-**.env.evolution**
-```bash
-# ==========================
-# EVOLUTION API
-# ==========================
-AUTHENTICATION_API_KEY=
-```
-
-Aperte `CTRL + x`, `y` e depois `ENTER` para salvar.
+Aqui você vai ter que modificar o nome do arquivo [.env-example](.env-example) para `.env` e atualizar seus valores.
 
 ### `Rodando o script de inicialização do projeto: init_project.sh`
 
