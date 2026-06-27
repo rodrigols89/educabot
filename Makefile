@@ -37,9 +37,11 @@ PRECOMMIT := $(VENV)/bin/pre-commit
 		export_dev export_prod \
 		start_compose down_compose restart_compose build_compose clean_compose \
 		open_db open_evolution \
+		log_postgres log_redis log_evolution \
 		server check_server kill_server \
 		init_project init_service \
-		service_status service_stop service_restart service_logs
+		service_status service_stop service_restart service_logs \
+		menu
 
 
 # ------------------------------- ( Linting ) -------------------------------
@@ -81,6 +83,10 @@ export_dev:
 export_prod:
 	cd $(ROOT)
 	$(UV) export --no-dev --no-hashes -o requirements.txt
+
+menu:
+	cd $(ROOT)
+	bash scripts/menu.sh
 
 
 # ---------------------------- ( Docker Management ) ------------------------
