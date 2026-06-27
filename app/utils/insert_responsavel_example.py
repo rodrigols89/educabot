@@ -2,7 +2,7 @@
 
 """
 From Root dir run the command below:
-python -m app.utils.insert_responsavel_example
+python insert_responsavel.py
 """
 
 from sqlalchemy.orm import Session

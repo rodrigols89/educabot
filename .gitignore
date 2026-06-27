@@ -287,3 +287,4 @@ certbot
 
 # Personal script
 app/utils/insert_responsavel.py
+insert_responsavel.py
