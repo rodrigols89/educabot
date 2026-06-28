@@ -7,18 +7,17 @@ pedidos no sistema.
 
 Descrição estendida:
 Este módulo implementa a lógica de negócio para criação de
-pedidos a partir de comandos recebidos.
+pedidos a partir dos comandos recebidos pela aplicação.
 
-Antes de criar um pedido, o serviço valida se já existe um
-pedido do mesmo tipo para o responsável no dia atual, evitando
-duplicidades.
+Antes de criar um pedido, o serviço verifica se o responsável
+já realizou um pedido da mesma categoria no dia atual,
+evitando solicitações duplicadas.
 
 Responsabilidades principais:
-- Interpretar comandos de criação de pedido
 - Converter comandos em tipos de pedido
-- Validar existência de pedidos no dia atual
+- Validar pedidos duplicados no dia atual
 - Criar novos pedidos quando permitido
-- Registrar logs de execução
+- Registrar informações de depuração
 
 Componentes principais:
 - create_order
@@ -31,42 +30,42 @@ Dependências:
 - app.repositories.pedido_repository
 
 Efeitos colaterais:
-- Pode persistir novos pedidos no banco de dados
-- Executa consultas de validação
-- Escreve logs de depuração na saída padrão
+- Executa consultas no banco de dados
+- Pode persistir novos pedidos
+- Escreve informações de depuração na saída padrão
 
 Entrada/Saída:
-- Entrada: sessão ORM, responsável e comando
-- Saída: tupla contendo pedido criado (ou None) e tipo
+- Entrada: sessão ORM, responsável e comando recebido
+- Saída: pedido criado (ou None) e o tipo do pedido
 
 Estratégia de tratamento de erros:
 - Não realiza tratamento explícito de exceções
-- Erros de ORM são propagados ao chamador
-- Falhas de validação retornam None
+- Erros do ORM são propagados ao chamador
+- Utiliza None para indicar pedidos duplicados
 
 Considerações de performance:
-- Executa consulta prévia antes de inserção
-- Evita duplicação de registros por dia
+- Executa uma consulta antes da criação do pedido
+- Evita inserções desnecessárias quando já existe pedido no dia
 
 Notas de concorrência:
-- Depende do gerenciamento de sessão SQLAlchemy
-- Pode haver condição de corrida sem bloqueios adicionais
+- Depende do gerenciamento da sessão SQLAlchemy
+- Pode haver condição de corrida sem restrições adicionais no
+  banco de dados
 
 Exemplo de uso:
 pedido, tipo = create_order(
     db=session,
     responsavel=responsavel,
-    command="/gas"
+    command="GAS"
 )
 
 Limitações:
 - Não valida permissões do responsável
-- Depende da integridade do comando recebido
-- Não trata concorrência entre múltiplas requisições
+- Não trata concorrência entre requisições simultâneas
 
 Versão/manutenção:
-- Regras de criação de pedidos devem ser mantidas nesta
-  camada de serviço.
+- Novas regras de criação de pedidos devem ser implementadas
+  nesta camada de serviço.
 """
 
 from sqlalchemy.orm import Session
@@ -89,68 +88,72 @@ def create_order(
 
     Args:
         db (Session):
-            Sessão ativa do SQLAlchemy utilizada para operações
-            de banco de dados.
+            Sessão ativa do SQLAlchemy utilizada para consultas
+            e persistência.
 
         responsavel (Responsavel):
-            Entidade responsável pela solicitação do pedido.
+            Responsável que realizou a solicitação.
 
         command (str):
-            Comando recebido pela aplicação, representando o tipo
-            de pedido (ex: "/gas", "/agua").
+            Comando recebido contendo o tipo do pedido, como
+            "GAS" ou "AGUA".
 
     Returns:
         tuple[Pedido | None, TipoPedido]:
-            Retorna uma tupla contendo:
+            Tupla contendo:
 
-            - Pedido criado quando a operação é bem-sucedida.
-            - None quando já existe um pedido do mesmo tipo no dia.
-            - TipoPedido correspondente ao comando processado.
+            - O pedido criado quando a operação for bem-sucedida.
+            - None quando já existir um pedido da mesma categoria
+              no dia atual.
+            - O tipo do pedido identificado.
 
     Raises:
         KeyError:
-            Pode ocorrer caso o comando não corresponda a um valor
-            válido do enum TipoPedido.
+            Pode ocorrer caso o comando não corresponda a um
+            valor válido de TipoPedido.
 
         sqlalchemy.exc.SQLAlchemyError:
-            Pode ser propagada durante consulta ou persistência.
+            Pode ser propagada durante consultas ou persistência.
 
     Observações:
-        O comando é normalizado removendo "/" e convertido para
-        maiúsculas antes da conversão para enum.
+        O comando é convertido para letras maiúsculas antes da
+        conversão para o enum TipoPedido.
 
     Efeitos colaterais:
-        - Consulta o banco de dados para validação.
-        - Pode inserir um novo registro de pedido.
-        - Pode executar commit via repositório.
+        - Executa consultas no banco de dados.
+        - Pode criar um novo registro de pedido.
+        - Pode executar commit por meio do repositório.
+        - Escreve informações de depuração na saída padrão.
 
     Exemplos:
         pedido, tipo = create_order(
             db=session,
             responsavel=responsavel,
-            command="/gas"
+            command="GAS"
         )
 
         pedido, tipo = create_order(
             db=session,
             responsavel=responsavel,
-            command="/agua"
+            command="AGUA"
         )
 
         if pedido is None:
             print("Pedido já realizado hoje")
 
     Avisos:
-        A função depende da validação prévia do responsável.
+        A função pressupõe que o comando já foi validado pela
+        camada responsável pela validação.
 
     Limitações:
-        Não valida permissões do responsável.
-        Não trata concorrência entre múltiplas requisições.
+        A verificação de duplicidade ocorre apenas por consulta
+        prévia e não substitui restrições de unicidade no banco
+        de dados.
     """
 
     print("\nCREATE ORDER PROCESS:")
 
-    request_type = command.replace("/", "").upper()
+    request_type = command.upper()
     tipo = TipoPedido[request_type]
 
     existing_request = get_today_pedido(
@@ -159,9 +162,11 @@ def create_order(
         tipo=tipo,
     )
 
-    # 🚫 já existe pedido dessa categoria hoje
+    # 🚫 Já existe um pedido dessa categoria hoje
     if existing_request:
-        print(f"Você já fez um pedido dessa categoria ({tipo}) hoje.")
+        print(
+            f"Você já fez um pedido dessa categoria ({tipo}) hoje."
+        )
         return None, tipo
 
     pedido = Pedido(

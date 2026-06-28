@@ -11,8 +11,8 @@ mensagem recebida corresponde a um comando suportado pelo
 sistema.
 
 Antes da validação, o texto é normalizado para evitar
-diferenças causadas por espaços extras ou letras maiúsculas e
-minúsculas.
+diferenças causadas por espaços extras ou pelo uso de letras
+maiúsculas e minúsculas.
 
 Responsabilidades principais:
 - Validar comandos recebidos
@@ -24,10 +24,10 @@ Componentes principais:
 - is_valid_command
 
 Dependências:
-- app.utils.logger.print_separator
+- Nenhuma
 
 Efeitos colaterais:
-- Escreve logs de depuração na saída padrão
+- Escreve informações de depuração na saída padrão
 
 Entrada/Saída:
 - Entrada: conteúdo textual da mensagem
@@ -38,21 +38,21 @@ Estratégia de tratamento de erros:
 - Evita processamento de mensagens vazias
 
 Considerações de performance:
-- Executa apenas operações simples de string
-- Não realiza acesso a banco de dados ou APIs externas
+- Executa apenas operações simples sobre strings
+- Não realiza acesso a banco de dados ou serviços externos
 
 Notas de concorrência:
 - Não mantém estado compartilhado
 - Seguro para execução concorrente
-- Logs podem ser intercalados em execuções simultâneas
+- Os logs podem ser intercalados em execuções simultâneas
 
 Exemplo de uso:
-if is_valid_command("/gas"):
+if is_valid_command("gas"):
     process_command()
 
 Limitações:
 - Reconhece apenas comandos previamente cadastrados
-- Não interpreta argumentos ou parâmetros
+- Não interpreta argumentos ou parâmetros adicionais
 
 Versão/manutenção:
 - Novos comandos devem ser adicionados à lista de comandos
@@ -64,7 +64,7 @@ def is_valid_command(
     text: str | None,
 ) -> bool:
     """
-    Verifica se um texto corresponde a um comando válido.
+    Verifica se um texto corresponde a um comando suportado.
 
     Args:
         text (str | None):
@@ -83,25 +83,26 @@ def is_valid_command(
 
     Observações:
         O texto é normalizado por meio da remoção de espaços
-        excedentes e conversão para letras minúsculas antes da
-        validação.
+        excedentes e da conversão para letras minúsculas antes
+        da validação.
 
     Efeitos colaterais:
-        - Escreve logs de depuração na saída padrão.
-        - Registra o resultado da validação.
+        - Escreve informações de depuração na saída padrão.
+        - Registra se o comando foi aceito ou ignorado.
 
     Exemplos:
-        is_valid_command("/gas")
+        is_valid_command("gas")
         # True
 
-        is_valid_command(" /AGUA ")
+        is_valid_command(" AGUA ")
         # True
 
-        is_valid_command("Olá")
+        is_valid_command("olá")
         # False
 
     Avisos:
-        Apenas comandos cadastrados internamente são aceitos.
+        Apenas os comandos cadastrados internamente são
+        considerados válidos.
 
     Limitações:
         Não interpreta argumentos.
@@ -120,13 +121,13 @@ def is_valid_command(
 
     # Supported commands
     is_valid = text in {
-        "/gas",
-        "/agua",
+        "gas",
+        "agua",
     }
 
     if is_valid:
         print(f"Comando válido: {text}")
     else:
-        print(f"Comando inválido: {text}")
+        print(f"Comando ignorado: {text}")
 
     return is_valid
