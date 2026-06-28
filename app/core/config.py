@@ -126,9 +126,6 @@ class Settings:
         SUPPLIER_SECRETARIAT_WATER_PHONE (str):
             Telefone do fornecedor da secretaria.
 
-        SECRETARIAT_PHONES (list[str]):
-            Lista de telefones pertencentes à secretaria.
-
     Visão geral dos métodos:
         Não possui métodos próprios.
         Atua como um objeto de configuração.
@@ -141,9 +138,6 @@ class Settings:
         api_url = settings.EVOLUTION_API_URL
 
         redis_uri = settings.CACHE_REDIS_URI
-
-        if phone in settings.SECRETARIAT_PHONES:
-            processar()
 
     Notas sobre concorrência:
         A classe é utilizada apenas para leitura e pode ser
@@ -228,15 +222,6 @@ class Settings:
         "SUPPLIER_SECRETARIAT_WATER_PHONE",
         "",
     )
-
-    SECRETARIAT_PHONES: list[str] = [
-        phone.strip()
-        for phone in os.getenv(
-            "SECRETARIAT_PHONES",
-            "",
-        ).split(",")
-        if phone.strip()
-    ]
 
 
 settings = Settings()
