@@ -1,14 +1,9 @@
 # ============================================================================
-# 🚀 MAKEFILE - PROJECT COMMANDS                                            #
+# 🚀 MAKEFILE - PROJECT COMMANDS
 # ============================================================================
 
-# Não ecoar comandos no terminal
 .SILENT:
-
-# Executar todas as linhas do target no mesmo shell
 .ONESHELL:
-
-# Shell padrão
 SHELL := /bin/bash
 
 
@@ -39,7 +34,7 @@ PRECOMMIT := $(VENV)/bin/pre-commit
 		open_db open_evolution \
 		log_postgres log_redis log_evolution \
 		server check_server kill_server \
-		init_project init_service \
+		init_project init_service remove_service \
 		service_status service_stop service_restart service_logs \
 		menu
 
@@ -108,11 +103,11 @@ build_compose:
 	docker compose up --build -d
 
 clean_compose:
-	docker stop $$(docker ps -aq) 2>/dev/null || true
-	docker rm $$(docker ps -aq) 2>/dev/null || true
-	docker rmi -f $$(docker images -aq) 2>/dev/null || true
-	docker volume rm $$(docker volume ls -q) 2>/dev/null || true
-	docker system prune -a --volumes -f
+	cd $(ROOT)
+	docker compose down \
+		--volumes \
+		--remove-orphans \
+		--rmi all
 
 
 # ------------------------------- ( Docker Exec ) ---------------------------
@@ -156,7 +151,7 @@ kill_server:
 	pkill -f "uvicorn app.main:app" 2>/dev/null || true
 
 
-# -------------------------- ( Initialization Scripts ) ---------------------
+# ------------------------------ ( Useful Scripts ) -------------------------
 
 init_project:
 	cd $(ROOT)
@@ -165,6 +160,10 @@ init_project:
 init_service:
 	cd $(ROOT)
 	bash scripts/init_service.sh
+
+remove_service:
+	cd $(ROOT)
+	bash scripts/remove_service.sh
 
 
 # ------------------------------ ( Service Status ) -------------------------

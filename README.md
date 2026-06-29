@@ -296,6 +296,14 @@ Insere gestores
 Projeto pronto
 ```
 
+### `Configurando o systemd`
+
+Para configurar um serviço que rode o nosso projeto em background, vamos executar um script que vai fazer todo esse processo automaticamente:
+
+```bash
+make init_service
+```
+
 ### `Inserindo pessoas (números) autorizados a fazer pedidos`
 
 Agora, que você já aplicou todas as migrações e seu Banco de Dados está disponível é interessante você inserir as pessoas (números) que tem permissões de fazer pedidos:
@@ -310,6 +318,27 @@ python insert_responsavel.py
 
 **NOTE:**  
 > No exemplo acima você vai criar uma cópia do [app/utils/insert_responsavel_example.py](app/utils/insert_responsavel_example.py) e adaptar para seus clientes. Depois e só executar ele na raiz do projeto (igual eu fiz acima).
+
+### `Criando um alias para abrir seu projeto`
+
+> Muitas vezes é chato ter que ficar dando vários comandos até chegar ao seu projeto com o ambiente virtual ativo.
+
+Para resolver isso, vamos criar o seguinte `alias`:
+
+**bash:**
+```bash
+echo 'alias educabot="cd ~/educabot && source .venv/bin/activate"' >> ~/.bashrc
+```
+
+**zshell:**
+```bash
+echo 'alias educabot="cd ~/educabot && source .venv/bin/activate"' >> ~/.zshrc
+```
+
+**Aplica alteração:**
+```bash
+source ~/.bashrc
+```
 
 ### `Configurando o Evolution API`
 
